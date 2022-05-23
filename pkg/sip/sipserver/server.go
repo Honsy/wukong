@@ -173,29 +173,24 @@ func (srv *server) Listen(network string, listenAddr string, options ...transpor
 
 func (srv *server) serve() {
 	defer srv.Shutdown()
-	srv.Log().Debugf("dddddor:serve")
 	for {
 		select {
 		case tx, ok := <-srv.tx.Requests():
 			if !ok {
 				return
 			}
-			srv.Log().Debugf("dddddor:Requests")
-
 			srv.hwg.Add(1)
 			go srv.handleRequest(tx.Origin(), tx)
 		case ack, ok := <-srv.tx.Acks():
 			if !ok {
 				return
 			}
-			srv.Log().Debugf("dddddor:Acks")
 			srv.hwg.Add(1)
 			go srv.handleRequest(ack, nil)
 		case response, ok := <-srv.tx.Responses():
 			if !ok {
 				return
 			}
-			srv.Log().Debugf("dddddor:Responses")
 			logger := srv.Log().WithFields(response.Fields())
 			logger.Warn("received not matched response")
 

@@ -1,8 +1,10 @@
 package transport
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"net"
 	"strings"
 	"sync"
@@ -216,8 +218,122 @@ func (tpl *transportLayer) handlerError(err error) {
 }
 
 func (tpl *transportLayer) Send(msg sip.Message) error {
+	select {
+	case <-tpl.canceled:
+		return fmt.Errorf("transport layer is canceled")
+	default:
+	}
 
-	return nil
+	viaHop, ok := msg.ViaHop()
+	if !ok {
+		return &sip.MalformedMessageError{
+			Err: fmt.Errorf("missing required 'Via' header"),
+			Msg: msg.String(),
+		}
+	}
+
+	switch msg := msg.(type) {
+	// RFC 3261 - 18.1.1.
+	case sip.Request:
+		network := msg.Transport()
+		// rewrite sent-by transport
+		viaHop.Transport = network
+		viaHop.Host = tpl.ip.String()
+
+		protocol, ok := tpl.protocols.get(protocolKey(network))
+		if !ok {
+			return UnsupportedProtocolError(fmt.Sprintf("protocol %s is not supported", network))
+		}
+
+		// rewrite sent-by port
+		if viaHop.Port == nil {
+			if ports, ok := tpl.listenPorts[network]; ok {
+				port := ports[rand.Intn(len(ports))]
+				viaHop.Port = &port
+			} else {
+				defPort := sip.DefaultPort(network)
+				viaHop.Port = &defPort
+			}
+		}
+
+		target, err := NewTargetFromAddr(msg.Destination())
+		if err != nil {
+			return fmt.Errorf("build address target for %s: %w", msg.Destination(), err)
+		}
+
+		// dns srv lookup
+		if net.ParseIP(target.Host) == nil {
+			ctx := context.Background()
+			proto := strings.ToLower(network)
+			if _, addrs, err := tpl.dnsResolver.LookupSRV(ctx, "sip", proto, target.Host); err == nil && len(addrs) > 0 {
+				addr := addrs[0]
+				addrStr := fmt.Sprintf("%s:%d", addr.Target[:len(addr.Target)-1], addr.Port)
+				switch network {
+				case "UDP":
+					if addr, err := net.ResolveUDPAddr("udp", addrStr); err == nil {
+						port := sip.Port(addr.Port)
+						if addr.IP.To4() == nil {
+							target.Host = fmt.Sprintf("[%v]", addr.IP.String())
+						} else {
+							target.Host = addr.IP.String()
+						}
+						target.Port = &port
+					}
+				case "TLS":
+					fallthrough
+				case "WS":
+					fallthrough
+				case "WSS":
+					fallthrough
+				case "TCP":
+					if addr, err := net.ResolveTCPAddr("tcp", addrStr); err == nil {
+						port := sip.Port(addr.Port)
+						if addr.IP.To4() == nil {
+							target.Host = fmt.Sprintf("[%v]", addr.IP.String())
+						} else {
+							target.Host = addr.IP.String()
+						}
+						target.Port = &port
+					}
+				}
+			}
+		}
+
+		logger := log.AddFieldsFrom(tpl.Log(), protocol, msg)
+		logger.Debugf("sending SIP request:\n%s", msg)
+
+		if err = protocol.Send(target, msg); err != nil {
+			return fmt.Errorf("send SIP message through %s protocol to %s: %w", protocol.Network(), target.Addr(), err)
+		}
+
+		return nil
+		// RFC 3261 - 18.2.2.
+	case sip.Response:
+		// resolve protocol from Via
+		protocol, ok := tpl.protocols.get(protocolKey(msg.Transport()))
+		if !ok {
+			return UnsupportedProtocolError(fmt.Sprintf("protocol %s is not supported", viaHop.Transport))
+		}
+
+		target, err := NewTargetFromAddr(msg.Destination())
+		if err != nil {
+			return fmt.Errorf("build address target for %s: %w", msg.Destination(), err)
+		}
+
+		logger := log.AddFieldsFrom(tpl.Log(), protocol, msg)
+		logger.Debugf("sending SIP response:\n%s", msg)
+
+		if err = protocol.Send(target, msg); err != nil {
+			return fmt.Errorf("send SIP message through %s protocol to %s: %w", protocol.Network(), target.Addr(), err)
+		}
+
+		return nil
+	default:
+		return &sip.UnsupportedMessageError{
+			Err: fmt.Errorf("unsupported message %s", msg.Short()),
+			Msg: msg.String(),
+		}
+	}
 }
 
 // 销毁

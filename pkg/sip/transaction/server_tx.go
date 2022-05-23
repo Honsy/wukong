@@ -159,7 +159,10 @@ func (tx *serverTx) Receive(msg sip.Message) error {
 }
 
 func (tx *serverTx) Respond(res sip.Response) error {
+	tx.Log().Debug("服务端相应Respond1")
+
 	if res.IsCancel() {
+		tx.Log().Debug("服务端相应Respond2")
 		_ = tx.tpl.Send(res)
 		return nil
 	}

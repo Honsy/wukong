@@ -67,8 +67,8 @@ var (
 	logger        log.Logger
 )
 
-func Setup(opts CameraOption, logger log.Logger) {
-	logger = logger
+func Setup(opts CameraOption, _logger log.Logger) {
+	logger = _logger
 	uri = make(map[string]*url.URL)
 	cameraOption = opts
 	connect()

@@ -136,7 +136,7 @@ func (txl *transactionLayer) handleMessage(msg sip.Message) {
 	}
 
 	logger := txl.Log().WithFields(msg.Fields())
-	logger.Debugf("handling SIP message")
+	logger.Debugf("处理SIP消息")
 
 	switch msg := msg.(type) {
 	case sip.Request:
@@ -249,7 +249,17 @@ func (txl *transactionLayer) handleResponse(res sip.Response, logger log.Logger)
 }
 
 func (tsl *transactionLayer) Cancel() {
+	select {
+	case <-tsl.canceled:
+		return
+	default:
+	}
 
+	tsl.cancelOnce.Do(func() {
+		close(tsl.canceled)
+
+		tsl.Log().Debug("transaction layer canceled")
+	})
 }
 func (tsl *transactionLayer) Done() <-chan struct{} {
 	return tsl.done

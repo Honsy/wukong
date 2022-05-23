@@ -1,0 +1,193 @@
+REGISTER sip:10.0.16.187:5060 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK2611429179
+From: <sip:34020000001320000003@340200000>;tag=408414310
+To: <sip:34020000001320000003@340200000>
+Call-ID: 2937054092
+CSeq: 1 REGISTER
+Contact: <sip:34020000001320000003@10.0.16.187:5063;line=58cca348a1b106d>
+Authorization: Capability, algorithm="H:MD5"
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Expires: 3600
+Content-Length: 0
+
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK2611429179
+From: <sip:34020000001320000003@340200000>;tag=408414310
+To: <sip:34020000001320000003@340200000>;tag=552440369
+Call-ID: 2937054092
+CSeq: 1 REGISTER
+User-Agent: eXosip/4.1.0
+WWW-Authenticate: Digest realm="34020000",algorithm=MD5,nonce="1653284848"
+Date: 2022-05-23T13:47:28.879
+Content-Length: 0
+
+REGISTER sip:10.0.16.187:5060 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK2314239025
+From: <sip:34020000001320000003@340200000>;tag=408414310
+To: <sip:34020000001320000003@340200000>
+Call-ID: 2937054092
+CSeq: 2 REGISTER
+Contact: <sip:34020000001320000003@10.0.16.187:5063;line=58cca348a1b106d>
+Authorization: Digest username="34020000001320000003", realm="34020000", nonce="1653284848", uri="sip:10.0.16.187:5060", response="fcb57d3fc5c3bb37869adb84c5e6f4b0", algorithm=MD5
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Expires: 3600
+Content-Length: 0
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK2314239025
+From: <sip:34020000001320000003@340200000>;tag=408414310
+To: <sip:34020000001320000003@340200000>;tag=2434341486
+Call-ID: 2937054092
+CSeq: 2 REGISTER
+User-Agent: eXosip/4.1.0
+Date: 2022-05-23T13:47:28.880
+Content-Length: 0
+
+MESSAGE sip:34020000001320000003@10.0.16.187:5063 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5060;rport;branch=z9hG4bK1408474636
+From: <sip:34020000002000000001@10.0.16.187:5060>;tag=1351074192
+To: <sip:34020000001320000003@10.0.16.187:5063>
+Call-ID: 169409573
+CSeq: 20 MESSAGE
+Content-Type: application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Date: 2022-05-23T13:47:28.886
+Content-Length:   125
+
+<?xml version="1.0"?>
+<Query>
+<CmdType>Catalog</CmdType>
+<SN>3</SN>
+<DeviceID>34020000001320000003</DeviceID>
+</Query>
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5060;rport=5060;branch=z9hG4bK1408474636
+From: <sip:34020000002000000001@10.0.16.187:5060>;tag=1351074192
+To: <sip:34020000001320000003@10.0.16.187:5063>;tag=2384966841
+Call-ID: 169409573
+CSeq: 20 MESSAGE
+User-Agent: eXosip/4.1.0
+Content-Length: 0
+
+MESSAGE sip:34020000001320000003@10.0.16.187:5063 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5060;rport;branch=z9hG4bK3755358952
+From: <sip:34020000002000000001@10.0.16.187:5060>;tag=3164252230
+To: <sip:34020000001320000003@10.0.16.187:5063>
+Call-ID: 4019043894
+CSeq: 20 MESSAGE
+Content-Type: application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Date: 2022-05-23T13:47:28.888
+Content-Length:   130
+
+<?xml version="1.0"?>
+<Query>
+<CmdType>DeviceStatus</CmdType>
+<SN>4</SN>
+<DeviceID>34020000001320000003</DeviceID>
+</Query>
+MESSAGE sip:34020000002000000001@10.0.16.187:5060 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK3734182057
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=4151706889
+To: <sip:34020000002000000001@10.0.16.187:5060>
+Call-ID: 522496186
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Content-Length:   859
+
+<?xml version="1.0"?>
+<Response>
+<CmdType>Catalog</CmdType>
+<SN>3</SN>
+<DeviceID>34020000001320000003</DeviceID>
+<SumNum>1</SumNum>
+<DeviceList Num="1">
+<Item>
+<DeviceID>34020000001320000003</DeviceID>
+<Name>IPC</Name>
+<Manufacturer>ABCD</Manufacturer>
+<Model>TEST001</Model>
+<Owner>Owner1</Owner>
+<CivilCode>CivilCode1</CivilCode>
+<Block>Block1</Block>
+<Address>Address1</Address>
+<Parental>0</Parental>
+<ParentID>34020000001320000003</ParentID>
+<SafetyWay>0</SafetyWay>
+<RegisterWay>1</RegisterWay>
+<CertNum>CertNum1</CertNum>
+<Certifiable>0</Certifiable>
+<ErrCode>400</ErrCode>
+<EndTime>2050-12-31T23:59:59</EndTime>
+<Secrecy>0</Secrecy>
+<IPAddress>10.0.16.187</IPAddress>
+<Port>5063</Port>
+<Password>Password1</Password>
+<Status>OK</Status>
+<Longitude></Longitude>
+<Latitude></Latitude>
+</Item>
+</DeviceList>
+</Response>
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5060;rport=5060;branch=z9hG4bK3755358952
+From: <sip:34020000002000000001@10.0.16.187:5060>;tag=3164252230
+To: <sip:34020000001320000003@10.0.16.187:5063>;tag=2693443974
+Call-ID: 4019043894
+CSeq: 20 MESSAGE
+User-Agent: eXosip/4.1.0
+Content-Length: 0
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK3734182057
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=4151706889
+To: <sip:34020000002000000001@10.0.16.187:5060>;tag=1041417535
+Call-ID: 522496186
+CSeq: 20 MESSAGE
+User-Agent: eXosip/4.1.0
+Content-Length: 0
+
+MESSAGE sip:34020000002000000001@10.0.16.187:5060 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK560931819
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=2004245970
+To: <sip:34020000002000000001@10.0.16.187:5060>
+Call-ID: 177744013
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Content-Length:   425
+
+<?xml version="1.0"?>
+<Response>
+<CmdType>DeviceStatus</CmdType>
+<SN>4</SN>
+<DeviceID>34020000001320000003</DeviceID>
+<Result>OK</Result>
+<Online>ONLINE</Online>
+<Status>OK</Status>
+<Encode>ON</Encode>
+<Record>OFF</Record>
+<DeviceTime>2019-09-08T11:12:20</DeviceTime>
+<Alarmstatus Num="1">
+<Item>
+<DeviceID>34020000001320000003</DeviceID>
+<DutyStatus>OFFDUTY</DutyStatus>
+</Item>
+</Alarmstatus>
+</Response>
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK560931819
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=2004245970
+To: <sip:34020000002000000001@10.0.16.187:5060>;tag=3122705130
+Call-ID: 177744013
+CSeq: 20 MESSAGE
+User-Agent: eXosip/4.1.0
+Content-Length: 0
+
