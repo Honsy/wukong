@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"test/log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,12 +12,22 @@ import (
 	"test/pkg/gb28181"
 	"test/pkg/onvif"
 	"test/pkg/setting"
+	"test/pkg/sip/sipserver"
 	"test/routers"
 )
 
+var (
+	logger log.Logger
+	server sipserver.Server
+)
+
 func init() {
+	logger = log.NewDefaultLogrusLogger().WithPrefix("WuKong")
+
 	setting.Setup()
 	models.Setup()
+
+	logger.SetLevel(log.WarnLevel)
 }
 
 func main() {
@@ -29,7 +39,7 @@ func main() {
 		Port:     80,
 		Username: "admin",
 		Passowrd: "admin1234",
-	})
+	}, logger)
 
 	routersInit := routers.InitRouter()
 
@@ -43,9 +53,9 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	log.Printf("[info] start http server listening %s", endPoint)
+	logger.Warn("[info] start http server listening %s", endPoint)
 
 	err := server.ListenAndServe()
 
-	log.Fatal(err)
+	logger.Fatal(err)
 }

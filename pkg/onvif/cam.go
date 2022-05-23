@@ -6,12 +6,12 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
+	"test/log"
 	"test/pkg/onvif/types"
 
 	"github.com/elgs/gostrgen"
@@ -55,16 +55,20 @@ type ActiveSource struct {
 }
 
 // props
-var media2Support = false
-var cameraOption CameraOption
-var uri map[string]*url.URL
-var capabilities types.Capabilities
-var videoSources []types.VideoSources
-var activeSource ActiveSource
-var activeSources []ActiveSource
-var profiles []types.Profile
+var (
+	media2Support bool
+	cameraOption  CameraOption
+	uri           map[string]*url.URL
+	capabilities  types.Capabilities
+	videoSources  []types.VideoSources
+	activeSource  ActiveSource
+	activeSources []ActiveSource
+	profiles      []types.Profile
+	logger        log.Logger
+)
 
-func Setup(opts CameraOption) {
+func Setup(opts CameraOption, logger log.Logger) {
+	logger = logger
 	uri = make(map[string]*url.URL)
 	cameraOption = opts
 	connect()
@@ -74,15 +78,15 @@ func Setup(opts CameraOption) {
 func connect() {
 	_, err := getSystemDateAndTime()
 	if err != nil {
-		log.Fatalf("getSystemDateAndTime Error %v", err)
+		logger.Fatalf("getSystemDateAndTime Error %v", err)
 	}
 	_, err = getServices()
 	if err != nil {
-		log.Fatalf("getServices Error %v", err)
+		logger.Fatalf("getServices Error %v", err)
 	}
 	_, err = getCapabilities()
 	if err != nil {
-		log.Fatalf("getCapabilities Error %v", err)
+		logger.Fatalf("getCapabilities Error %v", err)
 	}
 
 	// 全部成功判断
@@ -93,7 +97,7 @@ func connect() {
 
 	getActiveSources()
 
-	log.Printf("ONVIF CONNECTED")
+	logger.Printf("ONVIF CONNECTED")
 }
 
 // 获取系统时间
@@ -164,7 +168,7 @@ func getServices() (string, error) {
 		// uri解析
 		parsedNameSpace, err := url.Parse(value.Namespace)
 		if err != nil {
-			log.Println("Url Parse Error! ")
+			logger.Fatalf("Url Parse Error! ")
 			break
 		}
 		host := strings.Split(parsedNameSpace.Host, ":")[0]
@@ -193,14 +197,14 @@ func getCapabilities() (string, error) {
 	})
 
 	if err != nil {
-		log.Fatalf("GetCapabilities SOAP Error !")
+		logger.Fatalf("GetCapabilities SOAP Error !")
 		return "", err
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		log.Fatalf("GetCapabilities IO Read Error !")
+		logger.Fatalf("GetCapabilities IO Read Error !")
 		return "", err
 	}
 
@@ -257,7 +261,7 @@ func getActiveSources() {
 			}
 		}
 		if len(appropriateProfiles) == 0 {
-			log.Printf("No Profiles")
+			logger.Printf("No Profiles")
 			return
 		}
 		if idx == 0 {
@@ -328,7 +332,7 @@ func _request(requestOpts RequsetOptions) (*http.Response, error) {
 	// 建立请求
 	req, err := http.NewRequest("POST", url, strings.NewReader(requestOpts.body))
 	if err != nil {
-		log.Fatalln("Create Request Failed!")
+		logger.Fatal("Create Request Failed!")
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/soap+xml")
@@ -338,7 +342,7 @@ func _request(requestOpts RequsetOptions) (*http.Response, error) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		log.Fatalln("Request Failed", err)
+		logger.Fatal("Request Failed", err)
 		return nil, err
 	}
 
