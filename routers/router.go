@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"test/log"
 	"test/routers/api"
 	v1 "test/routers/api/v1"
 
@@ -10,7 +11,8 @@ import (
 func InitRouter() *gin.Engine {
 
 	r := gin.New()
-	r.Use(gin.Logger())
+	// 自定义Gin Logger
+	r.Use(log.GinLogger())
 	r.Use(gin.Recovery())
 	r.POST("/auth", api.GetAuth)
 	apiv1 := r.Group("/api/v1")
