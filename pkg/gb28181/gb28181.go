@@ -32,6 +32,10 @@ func INVITE(req sip.Request, tx sip.ServerTransaction) {
 // 设备注册
 func REGISTER(req sip.Request, tx sip.ServerTransaction) {
 	header := make([]sip.Header, 0)
+	if len(req.GetHeaders("Authorization")) == 0 {
+		server.RespondOnRequest(req, 401, "", "", header)
+		return
+	}
 	auth := sip.AuthFromValue(req.GetHeaders("Authorization")[0].Value())
 
 	// 判断请求头是否哦包含设备认证消息

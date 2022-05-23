@@ -159,37 +159,8 @@ func (tx *serverTx) Receive(msg sip.Message) error {
 }
 
 func (tx *serverTx) Respond(res sip.Response) error {
-	tx.Log().Debug("服务端相应Respond1")
-
-	if res.IsCancel() {
-		tx.Log().Debug("服务端相应Respond2")
-		_ = tx.tpl.Send(res)
-		return nil
-	}
-
-	tx.mu.Lock()
-	tx.lastResp = res
-
-	if tx.timer_1xx != nil {
-		tx.timer_1xx.Stop()
-		tx.timer_1xx = nil
-	}
-	tx.mu.Unlock()
-
-	var input fsm.Input
-	switch {
-	case res.IsProvisional():
-		input = server_input_user_1xx
-	case res.IsSuccess():
-		input = server_input_user_2xx
-	default:
-		input = server_input_user_300_plus
-	}
-
-	tx.fsmMu.RLock()
-	defer tx.fsmMu.RUnlock()
-
-	return tx.fsm.Spin(input)
+	_ = tx.tpl.Send(res)
+	return nil
 }
 
 func (tx *serverTx) Acks() <-chan sip.Request {
