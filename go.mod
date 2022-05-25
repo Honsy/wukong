@@ -3,7 +3,10 @@ module test
 go 1.18
 
 require (
+	github.com/astaxie/beego v1.12.3 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
+	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/discoviking/fsm v0.0.0-20150126104936-f4a273feecca // indirect
 	github.com/elgs/gostrgen v0.0.0-20220325073726-0c3e00d082f6 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
@@ -15,16 +18,23 @@ require (
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/prometheus/client_golang v1.7.0 // indirect
+	github.com/prometheus/client_model v0.2.0 // indirect
+	github.com/prometheus/common v0.10.0 // indirect
+	github.com/prometheus/procfs v0.1.3 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/tevino/abool v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect

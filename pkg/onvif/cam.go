@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"test/log"
+	"test/pkg/logging"
 	"test/pkg/onvif/types"
 
 	"github.com/elgs/gostrgen"
@@ -64,11 +64,9 @@ var (
 	activeSource  ActiveSource
 	activeSources []ActiveSource
 	profiles      []types.Profile
-	logger        log.Logger
 )
 
-func Setup(opts CameraOption, _logger log.Logger) {
-	logger = _logger
+func Setup(opts CameraOption) {
 	uri = make(map[string]*url.URL)
 	cameraOption = opts
 	connect()
@@ -78,15 +76,15 @@ func Setup(opts CameraOption, _logger log.Logger) {
 func connect() {
 	_, err := getSystemDateAndTime()
 	if err != nil {
-		logger.Fatalf("getSystemDateAndTime Error %v", err)
+		logging.Fatalf("getSystemDateAndTime Error %v", err)
 	}
 	_, err = getServices()
 	if err != nil {
-		logger.Fatalf("getServices Error %v", err)
+		logging.Fatalf("getServices Error %v", err)
 	}
 	_, err = getCapabilities()
 	if err != nil {
-		logger.Fatalf("getCapabilities Error %v", err)
+		logging.Fatalf("getCapabilities Error %v", err)
 	}
 
 	// 全部成功判断
@@ -97,7 +95,7 @@ func connect() {
 
 	getActiveSources()
 
-	logger.Printf("ONVIF CONNECTED")
+	logging.Printf("ONVIF CONNECTED")
 }
 
 // 获取系统时间
@@ -168,7 +166,7 @@ func getServices() (string, error) {
 		// uri解析
 		parsedNameSpace, err := url.Parse(value.Namespace)
 		if err != nil {
-			logger.Fatalf("Url Parse Error! ")
+			logging.Fatalf("Url Parse Error! ")
 			break
 		}
 		host := strings.Split(parsedNameSpace.Host, ":")[0]
@@ -197,14 +195,14 @@ func getCapabilities() (string, error) {
 	})
 
 	if err != nil {
-		logger.Fatalf("GetCapabilities SOAP Error !")
+		logging.Fatalf("GetCapabilities SOAP Error !")
 		return "", err
 	}
 
 	data, err := ioutil.ReadAll(res.Body)
 
 	if err != nil {
-		logger.Fatalf("GetCapabilities IO Read Error !")
+		logging.Fatalf("GetCapabilities IO Read Error !")
 		return "", err
 	}
 
@@ -261,7 +259,7 @@ func getActiveSources() {
 			}
 		}
 		if len(appropriateProfiles) == 0 {
-			logger.Printf("No Profiles")
+			logging.Printf("No Profiles")
 			return
 		}
 		if idx == 0 {
@@ -332,7 +330,7 @@ func _request(requestOpts RequsetOptions) (*http.Response, error) {
 	// 建立请求
 	req, err := http.NewRequest("POST", url, strings.NewReader(requestOpts.body))
 	if err != nil {
-		logger.Fatal("Create Request Failed!")
+		logging.Fatal("Create Request Failed!")
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/soap+xml")
@@ -342,7 +340,7 @@ func _request(requestOpts RequsetOptions) (*http.Response, error) {
 	res, err := client.Do(req)
 
 	if err != nil {
-		logger.Fatal("Request Failed", err)
+		logging.Fatal("Request Failed", err)
 		return nil, err
 	}
 

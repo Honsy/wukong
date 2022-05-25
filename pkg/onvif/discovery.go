@@ -2,6 +2,7 @@ package onvif
 
 import (
 	"net"
+	"test/pkg/logging"
 
 	"github.com/gofrs/uuid"
 )
@@ -14,13 +15,13 @@ func probe() {
 	socket, err := net.DialUDP("upd", nil, addr)
 
 	if err != nil {
-		logger.Fatal("upd connect error !")
+		logging.Fatal("upd connect error !")
 		return
 	}
 	messageID, err := uuid.NewV4()
 
 	if err != nil {
-		logger.Fatal("failed to generate UUID: %v", err)
+		logging.Fatal("failed to generate UUID: %v", err)
 	}
 
 	requestStr :=
@@ -44,7 +45,7 @@ func probe() {
 		var data [1024]byte
 		_, _, read_err := socket.ReadFromUDP(data[:])
 		if read_err != nil {
-			logger.Fatalf("read upd error !")
+			logging.Fatalf("read upd error !")
 		}
 
 	}

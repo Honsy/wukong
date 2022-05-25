@@ -3,6 +3,7 @@ package onvif
 import (
 	"encoding/xml"
 	"io/ioutil"
+	"test/pkg/logging"
 	"test/pkg/onvif/types"
 )
 
@@ -51,7 +52,7 @@ func GetStreamUri(options StreamOptions) (string, error) {
 				_envelopeFooter(),
 		})
 		if err != nil {
-			logger.Fatalf("GetStreamUri Error %s", err)
+			logging.Fatalf("GetStreamUri Error %s", err)
 			return "", err
 		}
 		data, err := ioutil.ReadAll(res.Body)
@@ -65,7 +66,7 @@ func GetStreamUri(options StreamOptions) (string, error) {
 		err = xml.Unmarshal(data, streamUriEnvelope)
 
 		if err != nil {
-			logger.Fatalf("GetStreamUriEnvelope XML Parse Error!")
+			logging.Fatalf("GetStreamUriEnvelope XML Parse Error!")
 			return "", err
 		}
 
@@ -94,7 +95,7 @@ func getProfiles() (string, error) {
 				_envelopeFooter(),
 		})
 		if err != nil {
-			logger.Fatalf("GetProfiles Error!")
+			logging.Fatalf("GetProfiles Error!")
 			return "", nil
 		}
 
@@ -107,7 +108,7 @@ func getProfiles() (string, error) {
 		profileEnvelope := new(types.GetProfilesEnvelope)
 		err = xml.Unmarshal(data, profileEnvelope)
 		if err != nil {
-			logger.Fatalf("GetVideoSourcesEnvelope XML Parse Error! %v", err)
+			logging.Fatalf("GetVideoSourcesEnvelope XML Parse Error! %v", err)
 			return "", err
 		}
 
@@ -123,7 +124,7 @@ func getProfiles() (string, error) {
 		})
 
 		if err != nil {
-			logger.Fatalf("GetProfiles Error!")
+			logging.Fatalf("GetProfiles Error!")
 			return "", nil
 		}
 
@@ -148,7 +149,7 @@ func getVideoSources() (string, error) {
 	})
 
 	if err != nil {
-		logger.Fatalf("GetVideoSources Error!")
+		logging.Fatalf("GetVideoSources Error!")
 		return "", err
 	}
 	data, err := ioutil.ReadAll(res.Body)
@@ -160,7 +161,7 @@ func getVideoSources() (string, error) {
 	videoSourceEnvelope := new(types.GetVideoSourcesEnvelope)
 	err = xml.Unmarshal(data, videoSourceEnvelope)
 	if err != nil {
-		logger.Fatalf("GetVideoSourcesEnvelope XML Parse Error!")
+		logging.Fatalf("GetVideoSourcesEnvelope XML Parse Error!")
 		return "", err
 	}
 
