@@ -8,6 +8,57 @@ import (
 	"strings"
 )
 
+// WWW-Authenticate 数据结构
+var (
+	DEFAULT_ALGORITHM string = "MD5"
+	DEFAULT_SCHEME    string = "Digest"
+)
+
+type WWWAuthenticate struct {
+	Realm     string
+	Algorithm string
+	Nonce     string
+}
+
+func (wauth *WWWAuthenticate) Name() string {
+	return "WWW-Authenticate"
+}
+func (wauth *WWWAuthenticate) Value() string {
+	return DEFAULT_SCHEME + " realm=" + wauth.Realm + ",algorithm=" + wauth.Algorithm + ",nonce=" + wauth.Nonce + ""
+}
+
+// Clone returns copy of header struct.
+func (wauth *WWWAuthenticate) Clone() Header {
+	if wauth == nil {
+		var newHeader *WWWAuthenticate
+		return newHeader
+	}
+
+	return &WWWAuthenticate{
+		Realm:     wauth.Realm,
+		Algorithm: wauth.Algorithm,
+		Nonce:     wauth.Nonce,
+	}
+}
+func (wauth *WWWAuthenticate) String() string {
+	return fmt.Sprintf("%s: %s", wauth.Name(), wauth.Value())
+}
+func (wauth *WWWAuthenticate) Equals(other interface{}) bool {
+	if h, ok := other.(*WWWAuthenticate); ok {
+		if wauth == h {
+			return true
+		}
+		if wauth == nil && h != nil || wauth != nil && h == nil {
+			return false
+		}
+
+		return wauth.Realm == h.Realm &&
+			wauth.Nonce == h.Nonce && wauth.Algorithm == h.Algorithm
+	}
+
+	return false
+}
+
 // currently only Digest and MD5
 type Authorization struct {
 	realm     string

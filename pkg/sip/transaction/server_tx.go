@@ -158,6 +158,7 @@ func (tx *serverTx) Receive(msg sip.Message) error {
 	return tx.fsm.Spin(input)
 }
 
+// 此处修改为直接响应客户端消息
 func (tx *serverTx) Respond(res sip.Response) error {
 	_ = tx.tpl.Send(res)
 	return nil

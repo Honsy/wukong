@@ -554,16 +554,19 @@ func (srv *server) appendAutoHeaders(msg sip.Message) {
 	}
 }
 
+// 服务端允许通过的请求方法
 func (srv *server) getAllowedMethods() []sip.RequestMethod {
 	methods := []sip.RequestMethod{
 		sip.INVITE,
 		sip.ACK,
 		sip.CANCEL,
+		sip.MESSAGE,
 	}
 	added := map[sip.RequestMethod]bool{
-		sip.INVITE: true,
-		sip.ACK:    true,
-		sip.CANCEL: true,
+		sip.INVITE:  true,
+		sip.ACK:     true,
+		sip.CANCEL:  true,
+		sip.MESSAGE: true,
 	}
 
 	srv.hmu.RLock()

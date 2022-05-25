@@ -17,8 +17,16 @@ func InitRouter() *gin.Engine {
 	r.POST("/auth", api.GetAuth)
 	apiv1 := r.Group("/api/v1")
 	{
-		apiv1.GET("/onvif", v1.GetOnvifDevice)
-		apiv1.GET("/getOnvifRtsp", v1.GetOnvifRtsp)
+		onvif := apiv1.Group("/onvif")
+		{
+			onvif.GET("/device", v1.GetOnvifDevice)
+			onvif.GET("/getRtsp", v1.GetOnvifRtsp)
+		}
+		user := apiv1.Group("/user")
+		{
+			user.POST("/login", v1.Login)
+			user.POST("/register", v1.Register)
+		}
 	}
 	return r
 }

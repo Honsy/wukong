@@ -1,17 +1,21 @@
 package gb28181
 
 import (
+	"fmt"
+	"net/http"
 	"test/log"
 	"test/pkg/sip"
 	"test/pkg/sip/sipserver"
 )
 
 var (
-	logger log.Logger
-	server sipserver.Server
+	logger           log.Logger
+	server           sipserver.Server
+	defaultAlgorithm string
 )
 
 func init() {
+	defaultAlgorithm = "MD5"
 	logger = log.NewDefaultLogrusLogger().WithPrefix("SipServer")
 	// logger.SetLevel(log.TraceLevel)
 	logger.SetLevel(log.DebugLevel)
@@ -31,20 +35,25 @@ func INVITE(req sip.Request, tx sip.ServerTransaction) {
 
 // 设备注册
 func REGISTER(req sip.Request, tx sip.ServerTransaction) {
-	header := make([]sip.Header, 0)
+
+	// 判断请求头是否哦包含设备认证消息
 	if len(req.GetHeaders("Authorization")) == 0 {
-		server.RespondOnRequest(req, 401, "", "", header)
+		resp := sip.NewResponseFromRequest("", req, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized), "")
+		resp.AppendHeader(&sip.GenericHeader{HeaderName: "WWW-Authenticate", Contents: fmt.Sprintf("Digest Nonce=\"%s\", algorithm=MD5, Realm=\"%s\",qop=\"auth\"", req.MessageID(), req.MessageID())})
+		tx.Respond(resp)
 		return
 	}
 	auth := sip.AuthFromValue(req.GetHeaders("Authorization")[0].Value())
 
-	// 判断请求头是否哦包含设备认证消息
-	if auth.Username() != "" {
-		server.RespondOnRequest(req, 401, "sss", "", header)
-
+	// 判断设备认证消息是否包含User
+	if auth.Username() == "" {
+		resp := sip.NewResponseFromRequest("", req, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized), "")
+		resp.AppendHeader(&sip.GenericHeader{HeaderName: "WWW-Authenticate", Contents: fmt.Sprintf("Digest Nonce=\"%s\", algorithm=MD5, Realm=\"%s\",qop=\"auth\"", req.MessageID(), req.MessageID())})
+		tx.Respond(resp)
 		return
 	}
 
-	logger.Debugf("响应Register消息")
-	server.RespondOnRequest(req, 401, "", "", header)
+	// 响应注册成功
+	resp := sip.NewResponseFromRequest("", req, http.StatusOK, http.StatusText(http.StatusOK), "")
+	tx.Respond(resp)
 }
