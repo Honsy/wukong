@@ -3,6 +3,7 @@ package v1
 import (
 	"test/pkg/app"
 	"test/pkg/enum"
+	userservice "test/service/user_service"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,6 +25,17 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	mUser := &userservice.User{
+		Username: user.Username,
+		Password: user.Passowrd,
+	}
+
+	_, err := mUser.GetUserByUsername()
+
+	if err != nil {
+		appG.Response(enum.SUCCESS, enum.ERROR, nil)
+		return
+	}
 }
 
 func Register(c *gin.Context) {
