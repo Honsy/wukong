@@ -1,8 +1,10 @@
 package log
 
 import (
+	"bytes"
+	"fmt"
+
 	"github.com/sirupsen/logrus"
-	prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 type LogrusLogger struct {
@@ -37,6 +39,42 @@ const (
 	TraceLevel
 )
 
+type LogFormatter struct {
+}
+
+func (f *LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	var b *bytes.Buffer
+	if entry.Buffer != nil {
+		b = entry.Buffer
+	} else {
+		b = &bytes.Buffer{}
+	}
+
+	timestamp := entry.Time.Format("2006-01-02 15:04:05")
+
+	b.WriteString(fmt.Sprintf("[%s] [%s]", timestamp, entry.Level))
+	f.writeFields(b, entry)
+	b.WriteString(fmt.Sprintf(" msg=%s \n", entry.Message))
+	return b.Bytes(), nil
+}
+
+func (f *LogFormatter) writeFields(b *bytes.Buffer, entry *logrus.Entry) {
+	if len(entry.Data) != 0 {
+		fields := make([]string, 0, len(entry.Data))
+		for field := range entry.Data {
+			fields = append(fields, field)
+		}
+
+		for _, field := range fields {
+			f.writeField(b, entry, field)
+		}
+	}
+}
+
+func (f *LogFormatter) writeField(b *bytes.Buffer, entry *logrus.Entry, field string) {
+	fmt.Fprintf(b, "[%s:%v]", field, entry.Data[field])
+}
+
 func NewLogrusLogger(logrus logrus.Ext1FieldLogger, prefix string, fields Fields) *LogrusLogger {
 	return &LogrusLogger{
 		log:    logrus,
@@ -47,10 +85,11 @@ func NewLogrusLogger(logrus logrus.Ext1FieldLogger, prefix string, fields Fields
 
 func NewDefaultLogrusLogger() *LogrusLogger {
 	logger := logrus.New()
-	logger.Formatter = &prefixed.TextFormatter{
-		FullTimestamp:   true,
-		TimestampFormat: "2006-01-02 15:04:05.000",
-	}
+	logger.SetFormatter(&LogFormatter{})
+	// logger.Formatter = &prefixed.TextFormatter{
+	// 	FullTimestamp:   true,
+	// 	TimestampFormat: "2006-01-02 15:04:05.000",
+	// }
 
 	return NewLogrusLogger(logger, "main", nil)
 }

@@ -7,6 +7,7 @@ require (
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/discoviking/fsm v0.0.0-20150126104936-f4a273feecca // indirect
 	github.com/elgs/gostrgen v0.0.0-20220325073726-0c3e00d082f6 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect

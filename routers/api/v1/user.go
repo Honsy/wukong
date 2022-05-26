@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"test/lib"
+	"test/models"
 	"test/pkg/app"
 	"test/pkg/enum"
 	userservice "test/service/user_service"
@@ -30,12 +32,23 @@ func Login(c *gin.Context) {
 		Password: user.Passowrd,
 	}
 
-	_, err := mUser.GetUserByUsername()
+	userData, err := mUser.GetUserByUsername()
 
-	if err != nil {
-		appG.Response(enum.SUCCESS, enum.ERROR, nil)
+	if err != nil || (userData == models.User{}) {
+		appG.Response(enum.SUCCESS, enum.LOGIN_FAIL, err)
 		return
 	}
+
+	token, err := lib.GenerateToken(mUser.Username, mUser.Password)
+
+	if userData.Password != lib.MD5(mUser.Password) {
+		appG.Response(enum.SUCCESS, enum.LOGIN_FAIL, nil)
+		return
+	}
+
+	appG.Response(enum.SUCCESS, enum.SUCCESS, map[string]interface{}{
+		"token": token,
+	})
 }
 
 func Register(c *gin.Context) {

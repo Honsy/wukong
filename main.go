@@ -48,7 +48,7 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	logging.Warn("[info] start http server listening %s", endPoint)
+	logging.Warn("start http server listening %s", endPoint)
 
 	err := server.ListenAndServe()
 

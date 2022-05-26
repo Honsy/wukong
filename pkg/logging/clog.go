@@ -8,7 +8,7 @@ var (
 
 func init() {
 	logger = log.NewDefaultLogrusLogger().WithPrefix("WuKong")
-	logger.SetLevel(log.WarnLevel)
+	logger.SetLevel(log.DebugLevel)
 }
 
 // Debug output logs at debug level
