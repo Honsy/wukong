@@ -3,6 +3,7 @@ package gb28181
 import (
 	"fmt"
 	"net/http"
+	"test/lib"
 	"test/log"
 	"test/pkg/sip"
 	"test/pkg/sip/sipserver"
@@ -27,10 +28,28 @@ func Setup() {
 	server.Listen("udp", "0.0.0.0:5061", nil)
 	server.OnRequest(sip.INVITE, INVITE)
 	server.OnRequest(sip.REGISTER, REGISTER)
-
+	server.OnRequest(sip.MESSAGE, MESSAGE)
 }
 
 func INVITE(req sip.Request, tx sip.ServerTransaction) {
+
+}
+
+//
+func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
+	body := req.Body()
+	message := &MessageReceive{}
+
+	if err := lib.XMLDecode([]byte(body), message); err != nil {
+		logger.Errorf("Message Unmarshal xml err:", err, "body:", body)
+		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""))
+		return
+	}
+	lib.XMLDecode([]byte(req.Body()), message)
+
+	switch message.CmdType {
+	case "Keepalive":
+	}
 }
 
 // 设备注册

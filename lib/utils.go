@@ -1,10 +1,14 @@
 package lib
 
 import (
+	"bytes"
+	"encoding/xml"
 	"errors"
 	"net"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/html/charset"
 )
 
 func UnicodeDecode(v string) (string, error) {
@@ -62,4 +66,11 @@ func Uint16PtrEq(a *uint16, b *uint16) bool {
 	}
 
 	return *a == *b
+}
+
+// XMLDecode XMLDecode
+func XMLDecode(data []byte, v interface{}) error {
+	decoder := xml.NewDecoder(bytes.NewReader([]byte(data)))
+	decoder.CharsetReader = charset.NewReaderLabel
+	return decoder.Decode(v)
 }

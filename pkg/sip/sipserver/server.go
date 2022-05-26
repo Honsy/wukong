@@ -254,12 +254,12 @@ func (srv *server) handleRequest(req sip.Request, tx sip.ServerTransaction) {
 		}
 
 		// ACK request doesn't require any response, so just skip this step
-		if !req.IsAck() {
-			res := sip.NewResponseFromRequest("", req, 405, "Method Not Allowed", "")
-			if _, err := srv.Respond(res); err != nil {
-				logger.Errorf("respond '405 Method Not Allowed' failed: %s", err)
-			}
-		}
+		// if !req.IsAck() {
+		// 	res := sip.NewResponseFromRequest("", req, 405, "Method Not Allowed", "")
+		// 	if _, err := srv.Respond(res); err != nil {
+		// 		logger.Errorf("respond '405 Method Not Allowed' failed: %s", err)
+		// 	}
+		// }
 
 		return
 	}
