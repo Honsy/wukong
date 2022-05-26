@@ -45,8 +45,6 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""))
 		return
 	}
-	lib.XMLDecode([]byte(req.Body()), message)
-
 	switch message.CmdType {
 	case "Keepalive":
 	}
