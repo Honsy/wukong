@@ -136,7 +136,6 @@ func (txl *transactionLayer) handleMessage(msg sip.Message) {
 	}
 
 	logger := txl.Log().WithFields(msg.Fields())
-	logger.Debugf("处理SIP消息")
 
 	switch msg := msg.(type) {
 	case sip.Request:

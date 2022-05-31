@@ -39,6 +39,19 @@ func INVITE(req sip.Request, tx sip.ServerTransaction) {
 
 //
 func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
+	device, ok := parserDevicesFromReqeust(req)
+	if !ok {
+		// 未解析出来源用户返回错误
+		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""))
+		return
+	}
+	// 判断是否存在body数据
+	if len, have := req.ContentLength(); !have || len.Equals(0) {
+		// 不存在就直接返回的成功
+		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
+		return
+	}
+
 	body := req.Body()
 	message := &MessageReceive{}
 
@@ -49,6 +62,12 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 	}
 	switch message.CmdType {
 	case "Keepalive":
+		if err := sipMessageOnKeepAlive(device, body); err == nil {
+			tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
+			// 心跳后同步注册设备列表信息
+			sipCatalog(device)
+			return
+		}
 	}
 }
 
