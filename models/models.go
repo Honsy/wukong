@@ -14,8 +14,8 @@ var db *gorm.DB
 
 type Model struct {
 	ID         int       `gorm:"primary_key" json:"id"`
-	CreatedOn  time.Time `json:"created_on"`
-	ModifiedOn time.Time `json:"modified_on"`
+	CreatedOn  time.Time `gorm:"autoCreateTime:true" json:"created_on"`
+	ModifiedOn time.Time `gorm:"autoUpdateTime:true" json:"modified_on"`
 }
 
 func Setup() {

@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"test/lib"
 	"test/log"
+	"test/models"
+	"test/pkg/logging"
 	"test/pkg/sip"
 	"test/pkg/sip/sipserver"
 )
@@ -68,6 +70,31 @@ func REGISTER(req sip.Request, tx sip.ServerTransaction) {
 		resp.AppendHeader(&sip.GenericHeader{HeaderName: "WWW-Authenticate", Contents: fmt.Sprintf("Digest Nonce=\"%s\", algorithm=MD5, Realm=\"%s\",qop=\"auth\"", req.MessageID(), req.MessageID())})
 		tx.Respond(resp)
 		return
+	}
+
+	fromDevice, ok := parserDevicesFromReqeust(req)
+	if !ok {
+		return
+	}
+	// 查询库中是否存在该NVR设备
+	if device, err := models.GetDeviceByDeviceId(fromDevice.DeviceId); err == nil {
+		if device.Regist == 1 {
+			logging.Debug("该设备已经注册过了~")
+			// 执行信息修改操作
+		} else {
+			models.AddDevice(map[string]interface{}{
+				"name":        fromDevice.Name,
+				"device_id":   fromDevice.DeviceId,
+				"region":      fromDevice.Region,
+				"host":        fromDevice.Host,
+				"port":        fromDevice.Port,
+				"proto":       fromDevice.Proto,
+				"device_type": "",
+				"model_type":  "",
+				"regist":      1,
+				"active":      1,
+			})
+		}
 	}
 
 	// 响应注册成功

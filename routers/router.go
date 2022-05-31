@@ -19,17 +19,24 @@ func InitRouter() *gin.Engine {
 	root.POST("/auth", api.GetAuth)
 	// V1版本
 	apiv1 := root.Group("/api/v1")
-	// onvif
-	onvif := apiv1.Group("/onvif")
 	{
-		onvif.GET("/device", v1.GetOnvifDevice)
-		onvif.GET("/getRtsp", v1.GetOnvifRtsp)
-	}
-	// 用户
-	user := apiv1.Group("/user")
-	{
-		user.POST("/login", v1.Login)
-		user.POST("/register", v1.Register)
+		// onvif
+		onvif := apiv1.Group("/onvif")
+		{
+			onvif.GET("/device", v1.GetOnvifDevice)
+			onvif.GET("/getRtsp", v1.GetOnvifRtsp)
+		}
+		// 用户
+		user := apiv1.Group("/user")
+		{
+			user.POST("/login", v1.Login)
+			user.POST("/register", v1.Register)
+		}
+		// gb28181
+		gb28181 := apiv1.Group("/gb28181")
+		{
+			gb28181.GET("/devicelist", v1.GetDeviceList)
+		}
 	}
 	return r
 }

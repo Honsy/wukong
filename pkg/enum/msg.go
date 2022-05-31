@@ -9,6 +9,7 @@ var MsgFlags = map[int]string{
 	ERROR_AUTH_CHECK_TOKEN_TIMEOUT: "Token已超时",
 	ERROR_AUTH_TOKEN:               "Token生成失败",
 	ERROR_AUTH:                     "Token错误",
+	ERROR_GET_DEVICE_LIST:          "获取设备列表失败",
 }
 
 // GetMsg get error information based on Code
