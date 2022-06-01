@@ -92,7 +92,14 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 		return
 	}
 	switch message.CmdType {
+
+	case "Catalog":
+		// 设备列表
+		sipMessageOnCatalog(device, body)
+		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
+		return
 	case "Keepalive":
+		// 心跳
 		if err := sipMessageOnKeepAlive(device, body); err == nil {
 			tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
 			// 心跳后同步注册设备列表信息

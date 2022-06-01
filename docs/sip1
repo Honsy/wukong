@@ -1,0 +1,188 @@
+REGISTER sip:10.0.16.187:5061 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK1590914378
+From: <sip:34020000001320000003@340200000>;tag=3742472173
+To: <sip:34020000001320000003@340200000>
+Call-ID: 3457580198
+CSeq: 1 REGISTER
+Contact: <sip:34020000001320000003@10.0.16.187:5063;line=991f1c65c1c56ce>
+Authorization: Capability, algorithm="H:MD5"
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Expires: 3600
+Content-Length: 0
+
+SIP/2.0 401 Unauthorized
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK1590914378
+From: <sip:34020000001320000003@340200000>;tag=3742472173
+To: <sip:34020000001320000003@340200000>
+Call-ID: 3457580198
+CSeq: 1 REGISTER
+Content-Length: 0
+WWW-Authenticate: Digest Nonce="0c554bc2-8b54-4fdc-9a4d-2545c994880b", algorithm=MD5, Realm="0c554bc2-8b54-4fdc-9a4d-2545c994880b",qop="auth"
+Allow: INVITE, ACK, CANCEL, MESSAGE, REGISTER
+User-Agent: GoSIP
+
+REGISTER sip:10.0.16.187:5061 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK3512872390
+From: <sip:34020000001320000003@340200000>;tag=3742472173
+To: <sip:34020000001320000003@340200000>
+Call-ID: 3457580198
+CSeq: 2 REGISTER
+Contact: <sip:34020000001320000003@10.0.16.187:5063;line=991f1c65c1c56ce>
+Authorization: Digest username="34020000001320000003", realm="0c554bc2-8b54-4fdc-9a4d-2545c994880b", nonce="0c554bc2-8b54-4fdc-9a4d-2545c994880b", uri="sip:10.0.16.187:5061", response="a45ad141e5b8f787cd96101640cc80b2", algorithm=MD5, cnonce="0a4f113b", qop=auth, nc=00000001
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Expires: 3600
+Content-Length: 0
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK3512872390
+From: <sip:34020000001320000003@340200000>;tag=3742472173
+To: <sip:34020000001320000003@340200000>
+Call-ID: 3457580198
+CSeq: 2 REGISTER
+Content-Length: 0
+Allow: INVITE, ACK, CANCEL, MESSAGE, REGISTER
+User-Agent: GoSIP
+
+jaK.MESSAGE sip:34020000002000000001@10.0.16.187:5061 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK3904961644
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=664023286
+To: <sip:34020000002000000001@10.0.16.187:5061>
+Call-ID: 3237724576
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Content-Length:   152
+
+<?xml version="1.0"?>
+<Notify>
+<CmdType>Keepalive</CmdType>
+<SN>614</SN>
+<DeviceID>34020000001320000003</DeviceID>
+<Status>OK</Status>
+</Notify>
+SIP/2.0 200 
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport=5063;branch=z9hG4bK3904961644
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=664023286
+To: <sip:34020000002000000001@10.0.16.187:5061>
+Call-ID: 3237724576
+CSeq: 20 MESSAGE
+Content-Length: 0
+User-Agent: GoSIP
+
+MESSAGE sip:34020000001320000003@10.0.16.187:5063 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5061;branch=z9hG4bK.1RcswJPUmLOXnlW9aTPkAzoM7Skm3ZUq
+Call-ID:   0.825395
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+From: <sip:37070000082008000001@3707000008>
+To: <sip:34020000001320000003@10.0.16.187:5063>
+User-Agent: GoSIP
+Content-Length: 122
+
+<?xml version="1.0"?>
+<Query>
+<CmdType>Catalog</CmdType>
+<SN>17430</SN>
+<DeviceID>34020000001320000003</DeviceID>
+</Query>SIP/2.0 200 OK
+Via: SIP/2.0/UDP 10.0.16.187:5061;branch=z9hG4bK.1RcswJPUmLOXnlW9aTPkAzoM7Skm3ZUq
+From: <sip:37070000082008000001@3707000008>
+To: <sip:34020000001320000003@10.0.16.187:5063>;tag=1562958269
+Call-ID: 0.825395
+CSeq: 20 MESSAGE
+User-Agent: eXosip/4.1.0
+Content-Length: 0
+
+MESSAGE sip:34020000002000000001@10.0.16.187:5061 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK2805131747
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=1032864040
+To: <sip:34020000002000000001@10.0.16.187:5061>
+Call-ID: 2250547470
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Content-Length:   863
+
+<?xml version="1.0"?>
+<Response>
+<CmdType>Catalog</CmdType>
+<SN>17430</SN>
+<DeviceID>34020000001320000003</DeviceID>
+<SumNum>1</SumNum>
+<DeviceList Num="1">
+<Item>
+<DeviceID>34020000001320000003</DeviceID>
+<Name>IPC</Name>
+<Manufacturer>ABCD</Manufacturer>
+<Model>TEST001</Model>
+<Owner>Owner1</Owner>
+<CivilCode>CivilCode1</CivilCode>
+<Block>Block1</Block>
+<Address>Address1</Address>
+<Parental>0</Parental>
+<ParentID>34020000001320000003</ParentID>
+<SafetyWay>0</SafetyWay>
+<RegisterWay>1</RegisterWay>
+<CertNum>CertNum1</CertNum>
+<Certifiable>0</Certifiable>
+<ErrCode>400</ErrCode>
+<EndTime>2050-12-31T23:59:59</EndTime>
+<Secrecy>0</Secrecy>
+<IPAddress>10.0.16.187</IPAddress>
+<Port>5063</Port>
+<Password>Password1</Password>
+<Status>OK</Status>
+<Longitude></Longitude>
+<Latitude></Latitude>
+</Item>
+</DeviceList>
+</Response>
+MESSAGE sip:34020000002000000001@10.0.16.187:5061 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5063;rport;branch=z9hG4bK2805131747
+From: <sip:34020000001320000003@10.0.16.187:5063>;tag=1032864040
+To: <sip:34020000002000000001@10.0.16.187:5061>
+Call-ID: 2250547470
+CSeq: 20 MESSAGE
+Content-Type: Application/MANSCDP+xml
+Max-Forwards: 70
+User-Agent: eXosip/4.1.0
+Content-Length:   863
+
+<?xml version="1.0"?>
+<Response>
+<CmdType>Catalog</CmdType>
+<SN>17430</SN>
+<DeviceID>34020000001320000003</DeviceID>
+<SumNum>1</SumNum>
+<DeviceList Num="1">
+<Item>
+<DeviceID>34020000001320000003</DeviceID>
+<Name>IPC</Name>
+<Manufacturer>ABCD</Manufacturer>
+<Model>TEST001</Model>
+<Owner>Owner1</Owner>
+<CivilCode>CivilCode1</CivilCode>
+<Block>Block1</Block>
+<Address>Address1</Address>
+<Parental>0</Parental>
+<ParentID>34020000001320000003</ParentID>
+<SafetyWay>0</SafetyWay>
+<RegisterWay>1</RegisterWay>
+<CertNum>CertNum1</CertNum>
+<Certifiable>0</Certifiable>
+<ErrCode>400</ErrCode>
+<EndTime>2050-12-31T23:59:59</EndTime>
+<Secrecy>0</Secrecy>
+<IPAddress>10.0.16.187</IPAddress>
+<Port>5063</Port>
+<Password>Password1</Password>
+<Status>OK</Status>
+<Longitude></Longitude>
+<Latitude></Latitude>
+</Item>
+</DeviceList>
+</Response>

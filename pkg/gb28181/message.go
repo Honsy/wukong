@@ -54,6 +54,15 @@ type MessageNotify struct {
 	Info     string `xml:"Info"`
 }
 
+// MessageDeviceListResponse 设备明细列表返回结构
+type MessageDeviceListResponse struct {
+	CmdType  string          `xml:"CmdType"`
+	SN       int             `xml:"SN"`
+	DeviceID string          `xml:"DeviceID"`
+	SumNum   int             `xml:"SumNum"`
+	Item     []models.Camera `xml:"DeviceList>Item"`
+}
+
 // GetCatalogXML 获取NVR下设备列表指令
 func GetCatalogXML(id string) string {
 	return fmt.Sprintf(CatalogXML, id)
@@ -69,6 +78,32 @@ func sipMessageOnKeepAlive(u models.Device, body string) error {
 
 	// 更新数据库设备状态
 
+	return nil
+}
+
+// 设备列表数据处理
+func sipMessageOnCatalog(u models.Device, body string) error {
+	message := &MessageDeviceListResponse{}
+	if err := lib.XMLDecode([]byte(body), message); err != nil {
+		logging.Error("Message Unmarshal xml err:", err, "body:", body)
+		return err
+	}
+	if message.SumNum > 0 {
+		camera := models.Camera{}
+		for _, d := range message.Item {
+
+			// if err := dbClient.Get(deviceTB, M{"deviceid": d.DeviceID, "pdid": message.DeviceID}, &device); err == nil {
+			// 	device.PDID = message.DeviceID
+			// 	device.Active = time.Now().Unix()
+			// 	device.URIStr = fmt.Sprintf("sip:%s@%s", d.DeviceID, _sysinfo.Region)
+			// 	device.Status = transDeviceStatus(d.Status)
+			// 	dbClient.Update(deviceTB, M{"deviceid": d.DeviceID, "pdid": message.DeviceID}, M{"$set": device})
+			// 	go notify(notifyDeviceActive(device))
+			// } else {
+			// 	logrus.Infoln("deviceid not found,deviceid:", d.DeviceID, "pdid:", message.DeviceID, "err", err)
+			// }
+		}
+	}
 	return nil
 }
 

@@ -26,6 +26,33 @@ type Device struct {
 	Addr       *sip.Address `gorm:"-"`
 }
 
+// Devices 摄像头信息
+type Camera struct {
+	Model
+	// DeviceID 设备编号
+	DeviceID string `xml:"DeviceID" json:"deviceid"`
+	// Name 设备名称
+	Name         string `xml:"Name" json:"name"`
+	Manufacturer string `xml:"Manufacturer" json:"manufacturer"`
+	Owner        string `xml:"Owner" json:"owner"`
+	CivilCode    string `xml:"CivilCode" json:"civilcode"`
+	// Address ip地址
+	Address     string `xml:"Address" json:"address"`
+	Parental    int    `xml:"Parental" json:"parental"`
+	SafetyWay   int    `xml:"SafetyWay" json:"safetyway"`
+	RegisterWay int    `xml:"RegisterWay" json:"registerway"`
+	Secrecy     int    `xml:"Secrecy" json:"secrecy"`
+	// Status 状态  on 在线
+	Status string `xml:"Status" json:"status"`
+	// PDID 所属用户id
+	PDID string `json:"pdid"`
+	// Active 最后活跃时间
+	Active int64  `json:"active"`
+	URIStr string `json:"uri"`
+
+	addr *sip.Address `gorm:"-"`
+}
+
 // 查询Device根据deviceid
 func GetDeviceByDeviceId(id string) (Device, error) {
 	var nvr_device Device
