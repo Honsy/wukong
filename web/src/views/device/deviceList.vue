@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { getDeviceList } from "@/api";
+import { getDeviceList,ddd } from "@/api";
 
 export default {
   data() {

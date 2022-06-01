@@ -112,29 +112,31 @@ func (tx *clientTx) Init() error {
 		// If a reliable transport is being used, the client transaction SHOULD NOT
 		// start timer A (Timer A controls request retransmissions).
 		// Timer A - retransmission
-		tx.Log().Tracef("timer_a set to %v", Timer_A)
 
-		tx.mu.Lock()
-		tx.timer_a_time = Timer_A
+		// 此处关闭UDP传输下的消息重试机制
+		// tx.Log().Tracef("timer_a set to %v", Timer_A)
 
-		tx.timer_a = timing.AfterFunc(tx.timer_a_time, func() {
-			select {
-			case <-tx.done:
-				return
-			default:
-			}
+		// tx.mu.Lock()
+		// tx.timer_a_time = Timer_A
 
-			tx.Log().Trace("timer_a fired")
+		// tx.timer_a = timing.AfterFunc(tx.timer_a_time, func() {
+		// 	select {
+		// 	case <-tx.done:
+		// 		return
+		// 	default:
+		// 	}
 
-			tx.fsmMu.RLock()
-			if err := tx.fsm.Spin(client_input_timer_a); err != nil {
-				tx.Log().Errorf("spin FSM to client_input_timer_a failed: %s", err)
-			}
-			tx.fsmMu.RUnlock()
-		})
-		// Timer D is set to 32 seconds for unreliable transports
-		tx.timer_d_time = Timer_D
-		tx.mu.Unlock()
+		// 	tx.Log().Trace("timer_a fired")
+
+		// 	tx.fsmMu.RLock()
+		// 	if err := tx.fsm.Spin(client_input_timer_a); err != nil {
+		// 		tx.Log().Errorf("spin FSM to client_input_timer_a failed: %s", err)
+		// 	}
+		// 	tx.fsmMu.RUnlock()
+		// })
+		// // Timer D is set to 32 seconds for unreliable transports
+		// tx.timer_d_time = Timer_D
+		// tx.mu.Unlock()
 	}
 
 	// Timer B - timeout

@@ -9,21 +9,21 @@ import (
 // NVR 对象模型
 type Device struct {
 	Model
-	Name       string  `json:"name"`
-	DeviceId   string  `json:"device_id"`
-	Region     string  `json:"region"`
-	Host       string  `json:"host"`
-	Port       string  `json:"port"`
-	Proto      string  `json:"proto"`
-	DeviceType string  `json:"device_type"`
-	ModelType  string  `json:"model_type"`
-	Active     int     `json:"active"`
-	Regist     int     `json:"regist"`
-	Rport      string  `json:"rport"`
-	RAddr      string  `json:"raddr"`
-	TransPort  string  `json:"transport"`
-	URIStr     string  `json:"uristr"`
-	Addr       sip.Uri `gorm:"-"`
+	Name       string       `json:"name"`
+	DeviceId   string       `json:"device_id"`
+	Region     string       `json:"region"`
+	Host       string       `json:"host"`
+	Port       string       `json:"port"`
+	Proto      string       `json:"proto"`
+	DeviceType string       `json:"device_type"`
+	ModelType  string       `json:"model_type"`
+	Active     int          `json:"active"`
+	Regist     int          `json:"regist"`
+	Rport      string       `json:"rport"`
+	RAddr      string       `json:"raddr"`
+	TransPort  string       `json:"transport"`
+	URIStr     string       `json:"uristr"`
+	Addr       *sip.Address `gorm:"-"`
 }
 
 // 查询Device根据deviceid

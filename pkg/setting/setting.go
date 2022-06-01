@@ -18,8 +18,18 @@ type Server struct {
 	HttpPort int
 }
 
+type GB28181 struct {
+	Lid    string
+	Region string
+	Uid    string
+	Did    string
+	Unum   int
+	Dnum   int
+}
+
 var ServerSetting = &Server{}
 var DatabaseSetting = &Database{}
+var GBSetting = &GB28181{}
 
 var cfg *ini.File
 
@@ -33,4 +43,5 @@ func Setup() {
 
 	cfg.Section("server").MapTo(ServerSetting)
 	cfg.Section("database").MapTo(DatabaseSetting)
+	cfg.Section("gb28181").MapTo(GBSetting)
 }

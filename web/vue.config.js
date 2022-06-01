@@ -30,6 +30,7 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
+    host: 'dev.www192168000042.pinwheel.qycloud.com.cn',
     port: port,
     open: true,
     overlay: {

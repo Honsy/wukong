@@ -7,18 +7,21 @@ import (
 	"test/log"
 	"test/models"
 	"test/pkg/logging"
+	"test/pkg/setting"
 	"test/pkg/sip"
+	"test/pkg/sip/parser"
 	"test/pkg/sip/sipserver"
 )
 
 var (
 	logger           log.Logger
 	server           sipserver.Server
-	defaultAlgorithm string
+	defaultAlgorithm string = "MD5"
+	gbConfig         Config
+	serverDevices    models.Device
 )
 
 func init() {
-	defaultAlgorithm = "MD5"
 	logger = log.NewDefaultLogrusLogger().WithPrefix("SipServer")
 	// logger.SetLevel(log.TraceLevel)
 	logger.SetLevel(log.DebugLevel)
@@ -31,6 +34,34 @@ func Setup() {
 	server.OnRequest(sip.INVITE, INVITE)
 	server.OnRequest(sip.REGISTER, REGISTER)
 	server.OnRequest(sip.MESSAGE, MESSAGE)
+
+	loadConfig()
+}
+
+func loadConfig() {
+	gbConfig = Config{
+		GB28181: SysInfo{
+			Region: setting.GBSetting.Region,
+			LID:    setting.GBSetting.Lid,
+			UID:    setting.GBSetting.Uid,
+			DID:    setting.GBSetting.Did,
+			UNUM:   setting.GBSetting.Unum,
+			DNUM:   setting.GBSetting.Dnum,
+		},
+	}
+
+	uri, _ := parser.ParseSipUri(fmt.Sprintf("sip:%s@%s", gbConfig.GB28181.LID, gbConfig.GB28181.Region))
+
+	serverDevices = models.Device{
+		DeviceId: gbConfig.GB28181.DID,
+		Region:   gbConfig.GB28181.Region,
+		Addr: &sip.Address{
+			DisplayName: sip.String{Str: "sipserver"},
+			Uri:         &uri,
+			Params:      sip.NewParams(),
+		},
+	}
+
 }
 
 func INVITE(req sip.Request, tx sip.ServerTransaction) {

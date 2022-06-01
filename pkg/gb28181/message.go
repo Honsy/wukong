@@ -2,13 +2,18 @@ package gb28181
 
 import (
 	"fmt"
+	"math/rand"
 	"test/lib"
 	"test/models"
 	"test/pkg/logging"
 	"test/pkg/sip"
+	"time"
 )
 
 var DefaultSipVersion = "SIP/2.0"
+
+// ContentTypeXML XML contenttype
+var ContentTypeXML = sip.ContentType("Application/MANSCDP+xml")
 
 var (
 	// CatalogXML 获取设备列表xml样式
@@ -17,8 +22,7 @@ var (
 <CmdType>Catalog</CmdType>
 <SN>17430</SN>
 <DeviceID>%s</DeviceID>
-</Query>
-	`
+</Query>`
 	// RecordInfoXML 获取录像文件列表xml样式
 	RecordInfoXML = `<?xml version="1.0"?>
 <Query>
@@ -70,10 +74,24 @@ func sipMessageOnKeepAlive(u models.Device, body string) error {
 
 // 查询设备列表请求
 func sipCatalog(to models.Device) {
-	req := sip.NewRequest("", sip.MESSAGE, to.Addr, DefaultSipVersion, []sip.Header{}, GetCatalogXML(to.DeviceId), nil)
+	req := sip.NewRequest("", sip.MESSAGE, to.Addr.Uri, DefaultSipVersion, []sip.Header{}, GetCatalogXML(to.DeviceId), nil)
+	rand.Seed(time.Now().UnixNano())
+	callId := sip.CallID(fmt.Sprintf("%10f", rand.Float64()))
+	req.AppendHeader(&callId)
+	req.AppendHeader(&sip.CSeq{
+		SeqNo:      20,
+		MethodName: "MESSAGE",
+	})
+	req.AppendHeader(&ContentTypeXML)
+	req.AppendHeader(&sip.FromHeader{
+		Address: serverDevices.Addr.Uri,
+	})
+	req.AppendHeader(&sip.ToHeader{
+		Address: to.Addr.Uri,
+	})
 	_, err := server.Request(req)
 	if err != nil {
-		logging.Warn("sipCatalog  error,", err)
+		logging.Error("sipCatalog  error,", err)
 		return
 	}
 }
