@@ -89,19 +89,13 @@ func sipMessageOnCatalog(u models.Device, body string) error {
 		return err
 	}
 	if message.SumNum > 0 {
-		camera := models.Camera{}
 		for _, d := range message.Item {
-
-			// if err := dbClient.Get(deviceTB, M{"deviceid": d.DeviceID, "pdid": message.DeviceID}, &device); err == nil {
-			// 	device.PDID = message.DeviceID
-			// 	device.Active = time.Now().Unix()
-			// 	device.URIStr = fmt.Sprintf("sip:%s@%s", d.DeviceID, _sysinfo.Region)
-			// 	device.Status = transDeviceStatus(d.Status)
-			// 	dbClient.Update(deviceTB, M{"deviceid": d.DeviceID, "pdid": message.DeviceID}, M{"$set": device})
-			// 	go notify(notifyDeviceActive(device))
-			// } else {
-			// 	logrus.Infoln("deviceid not found,deviceid:", d.DeviceID, "pdid:", message.DeviceID, "err", err)
-			// }
+			if camera, err := models.GetCamera(d.DeviceID); err == nil {
+				camera.Active = time.Now().Unix()
+				models.UpdateCamera(camera.ID, camera)
+			} else {
+				logging.Info("设备未找到", d.DeviceID)
+			}
 		}
 	}
 	return nil

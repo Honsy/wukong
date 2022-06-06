@@ -106,3 +106,24 @@ func GetDevicesTotal() (int64, error) {
 
 	return count, nil
 }
+
+// 根据DeivceId查询摄像头
+func GetCamera(deviceId string) (Camera, error) {
+	var camera Camera
+	err := db.Debug().Select("*").Where("device_id = ?", deviceId).First(&camera).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return Camera{}, err
+	}
+
+	return camera, nil
+}
+
+// 更新摄像头
+func UpdateCamera(id int, data interface{}) error {
+	if err := db.Debug().Model(&Camera{}).Where("id = ?", id).Updates(data).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
