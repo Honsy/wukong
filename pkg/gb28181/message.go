@@ -89,12 +89,14 @@ func sipMessageOnCatalog(u models.Device, body string) error {
 		return err
 	}
 	if message.SumNum > 0 {
-		for _, d := range message.Item {
-			if camera, err := models.GetCamera(d.DeviceID); err == nil {
-				camera.Active = time.Now().Unix()
-				models.UpdateCamera(camera.ID, camera)
+		for _, camera := range message.Item {
+			if dbCamera, err := models.GetCamera(camera.DeviceID); err == nil {
+				dbCamera.Active = time.Now().Unix()
+				models.UpdateCamera(dbCamera.ID, dbCamera)
 			} else {
-				logging.Info("设备未找到", d.DeviceID)
+				// 此处自动接收NVR或者DVR子设备直接注册
+				models.InsertCamera(camera)
+				logging.Info("设备未找到", camera.DeviceID)
 			}
 		}
 	}

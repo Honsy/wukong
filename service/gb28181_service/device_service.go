@@ -7,11 +7,16 @@ import (
 
 type DeviceService struct {
 	service.PageCommon
-	maps interface{}
+	DeviceId string
+	maps     interface{}
 }
 
 func (u *DeviceService) GetDeviceList() ([]*models.Device, error) {
 	return models.GetDeivces(u.PageNumber, u.PageSize, u.getMaps())
+}
+
+func (u *DeviceService) GetCamerasWithDeivceId() ([]*models.Camera, error) {
+	return models.GetCamerasWithDeviceId(u.DeviceId)
 }
 
 func (u *DeviceService) Count() (int64, error) {

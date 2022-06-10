@@ -36,6 +36,7 @@ func InitRouter() *gin.Engine {
 		gb28181 := apiv1.Group("/gb28181")
 		{
 			gb28181.GET("/devicelist", v1.GetDeviceList)
+			gb28181.GET("/subdevicelist", v1.GetCamerasWithDeivceId)
 		}
 	}
 	return r

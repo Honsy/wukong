@@ -30,22 +30,22 @@ type Device struct {
 type Camera struct {
 	Model
 	// DeviceID 设备编号
-	DeviceID string `xml:"DeviceID" json:"deviceid"`
+	DeviceID string `xml:"DeviceID" json:"device_id"`
 	// Name 设备名称
 	Name         string `xml:"Name" json:"name"`
 	Manufacturer string `xml:"Manufacturer" json:"manufacturer"`
 	Owner        string `xml:"Owner" json:"owner"`
-	CivilCode    string `xml:"CivilCode" json:"civilcode"`
+	CivilCode    string `xml:"CivilCode" json:"civil_code"`
 	// Address ip地址
 	Address     string `xml:"Address" json:"address"`
 	Parental    int    `xml:"Parental" json:"parental"`
-	SafetyWay   int    `xml:"SafetyWay" json:"safetyway"`
+	SafetyWay   int    `xml:"SafetyWay" json:"safety_way"`
 	RegisterWay int    `xml:"RegisterWay" json:"registerway"`
 	Secrecy     int    `xml:"Secrecy" json:"secrecy"`
 	// Status 状态  on 在线
 	Status string `xml:"Status" json:"status"`
 	// PDID 所属用户id
-	PDID string `json:"pdid"`
+	PDID string `json:"pd_id"`
 	// Active 最后活跃时间
 	Active int64  `json:"active"`
 	URIStr string `json:"uri"`
@@ -107,12 +107,24 @@ func GetDevicesTotal() (int64, error) {
 	return count, nil
 }
 
-// 根据DeivceId查询摄像头
+// 查询NVR设备下所有的子设备
+func GetCamerasWithDeviceId(deviceId string) ([]*Camera, error) {
+	var cameras []*Camera
+	err := db.Debug().Select("*").Where("device_id = ?", deviceId).Find(&cameras).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cameras, nil
+}
+
+// 根据DeivceId查询单个子设备
 func GetCamera(deviceId string) (Camera, error) {
 	var camera Camera
 	err := db.Debug().Select("*").Where("device_id = ?", deviceId).First(&camera).Error
 
-	if err != nil && err != gorm.ErrRecordNotFound {
+	if err != nil {
 		return Camera{}, err
 	}
 
@@ -125,5 +137,13 @@ func UpdateCamera(id int, data interface{}) error {
 		return err
 	}
 
+	return nil
+}
+
+// 插入摄像头
+func InsertCamera(camera Camera) error {
+	if err := db.Create(&camera).Error; err != nil {
+		return err
+	}
 	return nil
 }
