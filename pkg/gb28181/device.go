@@ -33,6 +33,12 @@ func parserDevicesFromReqeust(req sip.Request) (models.Device, bool) {
 	u.DeviceType = req.GetHeaders("User-Agent")[0].String()
 	u.Host = via.Host
 	u.Port = via.Port.String()
+	contact, ok := req.Contact()
+	if ok {
+		u.Contact = contact.Address.String()
+		u.ContactUri = &contact.Address
+	}
+
 	report, ok := via.Params.Get("rport")
 	if ok && report != nil {
 		u.Rport = report.String()
@@ -41,7 +47,6 @@ func parserDevicesFromReqeust(req sip.Request) (models.Device, bool) {
 	if ok && raddr != nil {
 		u.RAddr = raddr.String()
 	}
-
 	u.TransPort = via.Transport
 	u.URIStr = header.Address.String()
 	u.Addr = sip.NewAddressFromFromHeader(header)

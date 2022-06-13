@@ -105,7 +105,15 @@ func sipMessageOnCatalog(u models.Device, body string) error {
 
 // 查询设备列表请求
 func sipCatalog(to models.Device) {
-	req := sip.NewRequest("", sip.MESSAGE, to.Addr.Uri, DefaultSipVersion, []sip.Header{}, GetCatalogXML(to.DeviceId), nil)
+	// 如果ContactMap存在使用map存放数据
+	var contactUri sip.ContactUri
+	if deviceContactMap[to.DeviceId] != nil {
+		contactUri = deviceContactMap[to.DeviceId]
+	} else {
+		contactUri = to.Addr.Uri
+	}
+
+	req := sip.NewRequest("", sip.MESSAGE, contactUri, DefaultSipVersion, []sip.Header{}, GetCatalogXML(to.DeviceId), nil)
 	rand.Seed(time.Now().UnixNano())
 	callId := sip.CallID(fmt.Sprintf("%10f", rand.Float64()))
 	req.AppendHeader(&callId)

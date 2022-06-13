@@ -19,9 +19,13 @@ var (
 	defaultAlgorithm string = "MD5"
 	gbConfig         Config
 	serverDevices    models.Device
+	addr             string
+	deviceContactMap map[string]sip.ContactUri
 )
 
 func init() {
+	deviceContactMap = make(map[string]sip.ContactUri, 0)
+
 	logger = log.NewDefaultLogrusLogger().WithPrefix("SipServer")
 	// logger.SetLevel(log.TraceLevel)
 	logger.SetLevel(log.DebugLevel)
@@ -29,6 +33,7 @@ func init() {
 
 // 启动sip服务器
 func Setup() {
+
 	server = sipserver.NewServer(sipserver.ServerConfig{}, nil, nil, logger)
 	server.Listen("udp", "0.0.0.0:5061", nil)
 	server.OnRequest(sip.INVITE, INVITE)
@@ -41,6 +46,8 @@ func Setup() {
 func loadConfig() {
 	gbConfig = Config{
 		GB28181: SysInfo{
+			IP:     setting.GBSetting.Ip,
+			Port:   setting.GBSetting.Port,
 			Region: setting.GBSetting.Region,
 			LID:    setting.GBSetting.Lid,
 			UID:    setting.GBSetting.Uid,
@@ -50,7 +57,8 @@ func loadConfig() {
 		},
 	}
 
-	uri, _ := parser.ParseSipUri(fmt.Sprintf("sip:%s@%s", gbConfig.GB28181.LID, gbConfig.GB28181.Region))
+	addr = fmt.Sprintf("%s:%s", gbConfig.GB28181.IP, gbConfig.GB28181.Port)
+	uri, _ := parser.ParseSipUri(fmt.Sprintf("sip:%s@%s", gbConfig.GB28181.LID, addr))
 
 	serverDevices = models.Device{
 		DeviceId: gbConfig.GB28181.DID,
@@ -70,7 +78,8 @@ func INVITE(req sip.Request, tx sip.ServerTransaction) {
 
 //
 func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
-	device, ok := parserDevicesFromReqeust(req)
+	fromDevice, ok := parserDevicesFromReqeust(req)
+
 	if !ok {
 		// 未解析出来源用户返回错误
 		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusBadRequest, http.StatusText(http.StatusBadRequest), ""))
@@ -81,6 +90,18 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 		// 不存在就直接返回的成功
 		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
 		return
+	}
+
+	// 判断当前设备是否存在于数据库中 不存在则返回401
+	if db_device, err := models.GetDeviceByDeviceId(fromDevice.DeviceId); err != nil {
+		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized), ""))
+		return
+	} else {
+		// 存在的话 生成contact_uri
+		if deviceContactMap[fromDevice.DeviceId] == nil {
+			uri, _ := parser.ParseSipUri(fmt.Sprintf("%s", db_device.Contact))
+			deviceContactMap[fromDevice.DeviceId] = &uri
+		}
 	}
 
 	body := req.Body()
@@ -95,15 +116,15 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 
 	case "Catalog":
 		// 设备列表
-		sipMessageOnCatalog(device, body)
+		sipMessageOnCatalog(fromDevice, body)
 		tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
 		return
 	case "Keepalive":
 		// 心跳
-		if err := sipMessageOnKeepAlive(device, body); err == nil {
+		if err := sipMessageOnKeepAlive(fromDevice, body); err == nil {
 			tx.Respond(sip.NewResponseFromRequest("", req, http.StatusOK, "", ""))
 			// 心跳后同步注册设备列表信息
-			sipCatalog(device)
+			sipCatalog(fromDevice)
 			return
 		}
 	}
@@ -135,9 +156,12 @@ func REGISTER(req sip.Request, tx sip.ServerTransaction) {
 	}
 	// 查询库中是否存在该NVR设备
 	if device, err := models.GetDeviceByDeviceId(fromDevice.DeviceId); err == nil {
+		deviceContactMap[fromDevice.DeviceId] = *fromDevice.ContactUri
 		if device.Regist == 1 {
 			logging.Debug("该设备已经注册过了~")
 			// 执行信息修改操作
+			device.Contact = fromDevice.Contact
+			models.UpdateDevice(device.DeviceId, device)
 		} else {
 			models.AddDevice(map[string]interface{}{
 				"name":        fromDevice.Name,
@@ -146,6 +170,7 @@ func REGISTER(req sip.Request, tx sip.ServerTransaction) {
 				"host":        fromDevice.Host,
 				"port":        fromDevice.Port,
 				"proto":       fromDevice.Proto,
+				"contact":     fromDevice.Contact,
 				"device_type": "",
 				"model_type":  "",
 				"regist":      1,

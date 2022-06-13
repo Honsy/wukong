@@ -9,21 +9,23 @@ import (
 // NVR 对象模型
 type Device struct {
 	Model
-	Name       string       `json:"name"`
-	DeviceId   string       `json:"device_id"`
-	Region     string       `json:"region"`
-	Host       string       `json:"host"`
-	Port       string       `json:"port"`
-	Proto      string       `json:"proto"`
-	DeviceType string       `json:"device_type"`
-	ModelType  string       `json:"model_type"`
-	Active     int          `json:"active"`
-	Regist     int          `json:"regist"`
-	Rport      string       `json:"rport"`
-	RAddr      string       `json:"raddr"`
-	TransPort  string       `json:"transport"`
-	URIStr     string       `json:"uristr"`
-	Addr       *sip.Address `gorm:"-"`
+	Name       string          `json:"name"`
+	DeviceId   string          `json:"device_id"`
+	Region     string          `json:"region"`
+	Host       string          `json:"host"`
+	Port       string          `json:"port"`
+	Proto      string          `json:"proto"`
+	DeviceType string          `json:"device_type"`
+	ModelType  string          `json:"model_type"`
+	Active     int             `json:"active"`
+	Regist     int             `json:"regist"`
+	Rport      string          `json:"rport"`
+	RAddr      string          `json:"raddr"`
+	TransPort  string          `json:"transport"`
+	URIStr     string          `json:"uristr"`
+	Contact    string          `json:"contact"` // 设备Contact信息 全局作用域
+	ContactUri *sip.ContactUri `gorm:"-"`
+	Addr       *sip.Address    `gorm:"-"`
 }
 
 // Devices 摄像头信息
@@ -75,10 +77,20 @@ func AddDevice(data map[string]interface{}) error {
 		Proto:      data["proto"].(string),
 		DeviceType: data["device_type"].(string),
 		ModelType:  data["model_type"].(string),
+		Contact:    data["contact"].(string),
 		Active:     data["active"].(int),
 		Regist:     data["regist"].(int),
 	}
 	if err := db.Create(&device).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// 增加Device
+func UpdateDevice(deviceId, data interface{}) error {
+	if err := db.Debug().Model(&Camera{}).Where("device_id = ?", deviceId).Updates(data).Error; err != nil {
 		return err
 	}
 

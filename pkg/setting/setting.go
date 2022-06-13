@@ -19,6 +19,8 @@ type Server struct {
 }
 
 type GB28181 struct {
+	Ip     string
+	Port   string
 	Lid    string
 	Region string
 	Uid    string

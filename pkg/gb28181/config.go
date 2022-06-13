@@ -17,4 +17,8 @@ type SysInfo struct {
 	DNUM int `json:"dnum"`
 	// LID 当前服务id
 	LID string `json:"lid"`
+	// Port
+	Port string `json:"port"`
+	// Ip
+	IP string `json:"ip"`
 }
