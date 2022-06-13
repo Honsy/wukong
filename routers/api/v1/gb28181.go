@@ -63,3 +63,10 @@ func GetCamerasWithDeivceId(c *gin.Context) {
 
 	appG.Response(http.StatusOK, enum.SUCCESS, data)
 }
+
+// 播放子设备
+func PlayCameraWithCameraId(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	appG.Response(http.StatusOK, enum.SUCCESS, nil)
+}
