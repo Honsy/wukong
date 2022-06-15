@@ -12,6 +12,9 @@ import (
 
 var DefaultSipVersion = "SIP/2.0"
 
+// SDP
+var ContentTypeSDP = sip.ContentType("application/sdp")
+
 // ContentTypeXML XML contenttype
 var ContentTypeXML = sip.ContentType("Application/MANSCDP+xml")
 
@@ -92,6 +95,7 @@ func sipMessageOnCatalog(u models.Device, body string) error {
 		for _, camera := range message.Item {
 			if dbCamera, err := models.GetCamera(camera.DeviceID); err == nil {
 				dbCamera.Active = time.Now().Unix()
+				dbCamera.URIStr = fmt.Sprintf("sip:%s@%s", camera.DeviceID, gbConfig.GB28181.Region)
 				models.UpdateCamera(dbCamera.ID, dbCamera)
 			} else {
 				// 此处自动接收NVR或者DVR子设备直接注册

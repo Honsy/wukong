@@ -2,7 +2,10 @@ package gb28181
 
 import (
 	"fmt"
+	"net"
 	"net/http"
+	"net/url"
+	"strconv"
 	"test/lib"
 	"test/log"
 	"test/models"
@@ -11,6 +14,8 @@ import (
 	"test/pkg/sip"
 	"test/pkg/sip/parser"
 	"test/pkg/sip/sipserver"
+
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -56,6 +61,18 @@ func loadConfig() {
 			DNUM:   setting.GBSetting.Dnum,
 		},
 	}
+
+	// 初始化媒体服务相关配置
+	url, err := url.Parse(setting.MediaSetting.Rtp)
+	if err != nil {
+		logrus.Fatalf("media rtp url error,url:%s,err:%v", setting.MediaSetting.Rtp, err)
+	}
+	ipaddr, err := net.ResolveIPAddr("ip", url.Hostname())
+	if err != nil {
+		logrus.Fatalf("media rtp url error,url:%s,err:%v", setting.MediaSetting.Rtp, err)
+	}
+	gbConfig.mediaServerRtpIP = ipaddr.IP
+	gbConfig.mediaServerRtpPort, _ = strconv.Atoi(url.Port())
 
 	addr = fmt.Sprintf("%s:%s", gbConfig.GB28181.IP, gbConfig.GB28181.Port)
 	uri, _ := parser.ParseSipUri(fmt.Sprintf("sip:%s@%s", gbConfig.GB28181.LID, addr))
