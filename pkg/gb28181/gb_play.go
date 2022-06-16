@@ -3,6 +3,7 @@ package gb28181
 import (
 	"fmt"
 	"net/http"
+	"sync"
 	"test/models"
 	"test/pkg/logging"
 	"test/pkg/sdp"
@@ -12,7 +13,7 @@ import (
 )
 
 // playParams 播放请求参数
-type playParams struct {
+type PlayParams struct {
 	// 0  直播 1 历史
 	T int
 	//  开始结束时间，只有t=1 时有效
@@ -27,13 +28,38 @@ type playParams struct {
 }
 
 // 请求播放
-func GBPlay() interface{} {
+func GBPlay(data PlayParams) interface{} {
 
-	return nil
+	camera, err := models.GetCamera(data.DeviceID)
+
+	if err != nil {
+		return "查找通道失败"
+	}
+	nvrDevice, err := models.GetDeviceByDeviceId(camera.PDID)
+
+	if err != nil {
+		return "查找NVR设备失败"
+	}
+
+	data, err = gbPlayPush(data, camera, nvrDevice)
+	if err != nil {
+		return fmt.Sprintf("获取视频失败:%v", err)
+	}
+	succ := map[string]interface{}{
+		"deviceid": nvrDevice.DeviceId,
+		"ssrc":     data.SSRC,
+		"http":     fmt.Sprintf("%s/rtp/%s/hls.m3u8", gbConfig.Media.Http, data.SSRC),
+		"rtmp":     fmt.Sprintf("%s/rtp/%s", gbConfig.Media.Rtmp, data.SSRC),
+		"rtsp":     fmt.Sprintf("%s/rtp/%s", gbConfig.Media.Rtsp, data.SSRC),
+		"ws-flv":   fmt.Sprintf("%s/rtp/%s.live.flv", gbConfig.Media.WS, data.SSRC),
+	}
+	return succ
 }
 
+var ssrcLock *sync.Mutex
+
 // 推送Media RTP Server
-func gbPlayPush(data playParams, camera models.Camera, device models.Device) (playParams, error) {
+func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (PlayParams, error) {
 	var (
 		sdpSession sdp.Session
 		byteData   []byte
@@ -44,7 +70,11 @@ func gbPlayPush(data playParams, camera models.Camera, device models.Device) (pl
 		name = "Playback"
 		protocal = "RTP/RTCP"
 	}
-
+	if data.SSRC == "" {
+		ssrcLock.Lock()
+		data.SSRC = "1111"
+		ssrcLock.Unlock()
+	}
 	// body体
 	video := sdp.Media{
 		Description: sdp.MediaDescription{
@@ -136,21 +166,28 @@ func gbPlayPush(data playParams, camera models.Camera, device models.Device) (pl
 		return data, err
 	}
 
+	// response
+	_, err = sipResponse(tx)
+	if err != nil {
+		logging.Warn("sipPlayPush response fail.id:", device.DeviceId, "err:", err)
+		return data, err
+	}
+
 	return data, nil
 }
 
-func sipResponse(ctx sip.ClientTransaction) sip.Response {
+func sipResponse(ctx sip.ClientTransaction) (sip.Response, error) {
 	for {
 		res := <-ctx.Responses()
 		if res == nil {
-			return res
+			return res, NewError(nil, "response timeout", "tx key:", ctx.Key())
 		}
 
 		logging.Debug("response tx", ctx.Key(), time.Now().Format("2006-01-02 15:04:05"))
-		if res.StatusCode() == http.StatusContinue || res.statusCode == http.StatusSwitchingProtocols {
+		if res.StatusCode() == http.StatusContinue || res.StatusCode() == http.StatusSwitchingProtocols {
 			// Trying and Dialog Establishement 等待下一个返回
 			continue
 		}
-		return res
+		return res, nil
 	}
 }

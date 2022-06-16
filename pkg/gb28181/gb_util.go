@@ -25,14 +25,3 @@ func (err *Error) Error() string {
 func NewError(err error, params ...interface{}) error {
 	return &Error{err, params}
 }
-
-// func sipResponse(tx *sip.Transaction) (*sip.Response, error) {
-// 	response := tx.GetResponse()
-// 	if response == nil {
-// 		return nil, NewError(nil, "response timeout", "tx key:", tx.Key())
-// 	}
-// 	if response.StatusCode() != http.StatusOK {
-// 		return response, NewError(nil, "response fail", response.StatusCode(), response.Reason(), "tx key:", tx.Key())
-// 	}
-// 	return response, nil
-// }

@@ -94,10 +94,12 @@ func sipMessageOnCatalog(u models.Device, body string) error {
 	if message.SumNum > 0 {
 		for _, camera := range message.Item {
 			if dbCamera, err := models.GetCamera(camera.DeviceID); err == nil {
+				dbCamera.PDID = u.DeviceId
 				dbCamera.Active = time.Now().Unix()
 				dbCamera.URIStr = fmt.Sprintf("sip:%s@%s", camera.DeviceID, gbConfig.GB28181.Region)
 				models.UpdateCamera(dbCamera.ID, dbCamera)
 			} else {
+				camera.PDID = u.DeviceId
 				// 此处自动接收NVR或者DVR子设备直接注册
 				models.InsertCamera(camera)
 				logging.Info("设备未找到", camera.DeviceID)

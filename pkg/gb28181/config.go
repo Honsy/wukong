@@ -2,6 +2,7 @@ package gb28181
 
 import (
 	"net"
+	"test/pkg/setting"
 )
 
 // Config Config
@@ -9,6 +10,7 @@ type Config struct {
 	GB28181            SysInfo `json:"gb28181"`
 	mediaServerRtpIP   net.IP
 	mediaServerRtpPort int
+	Media              setting.Media
 }
 type SysInfo struct {
 	// Region 当前域

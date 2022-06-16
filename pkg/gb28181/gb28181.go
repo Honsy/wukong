@@ -60,6 +60,7 @@ func loadConfig() {
 			UNUM:   setting.GBSetting.Unum,
 			DNUM:   setting.GBSetting.Dnum,
 		},
+		Media: *setting.MediaSetting,
 	}
 
 	// 初始化媒体服务相关配置
