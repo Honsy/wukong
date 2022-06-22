@@ -50,5 +50,6 @@ func parserDevicesFromReqeust(req sip.Request) (models.Device, bool) {
 	u.TransPort = via.Transport
 	u.URIStr = header.Address.String()
 	u.Addr = sip.NewAddressFromFromHeader(header)
+	u.Source = req.Source()
 	return u, true
 }

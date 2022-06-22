@@ -71,9 +71,9 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 		protocal = "RTP/RTCP"
 	}
 	if data.SSRC == "" {
-		ssrcLock.Lock()
+		// ssrcLock.Lock()
 		data.SSRC = "1111"
-		ssrcLock.Unlock()
+		// ssrcLock.Unlock()
 	}
 	// body体
 	video := sdp.Media{
@@ -137,6 +137,13 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 	} else {
 		contactUri = device.Addr.Uri
 	}
+
+	if contactUri != nil {
+		// Contact
+		hdrs = append(hdrs, &sip.ContactHeader{
+			Address: contactUri,
+		})
+	}
 	hdrs = append(hdrs, &sip.FromHeader{
 		Address: contactUri,
 	})
@@ -146,10 +153,6 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 			Params: sip.NewParams().Add("branch", sip.String{Str: sip.GenerateBranch()}),
 		},
 	})
-	// Contact
-	hdrs = append(hdrs, &sip.ContactHeader{
-		Address: contactUri,
-	})
 	// ContentType
 	hdrs = append(hdrs, &ContentTypeSDP)
 	// CSeq Method
@@ -158,7 +161,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 	})
 
 	req := sip.NewRequest("", sip.INVITE, device.Addr.Uri, DefaultSipVersion, hdrs, string(byteData), nil)
-
+	req.SetDestination(device.Source)
 	tx, err := server.Request(req)
 
 	if err != nil {

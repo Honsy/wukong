@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"sync"
 	"test/lib"
 	"test/log"
 	"test/models"
@@ -18,6 +19,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// ActiveDevices 记录当前活跃设备，请求播放时设备必须处于活跃状态
+type ActiveDevices struct {
+	sync.Map
+}
+
+// Get Get
+func (a *ActiveDevices) Get(key string) (models.Device, bool) {
+	if v, ok := a.Load(key); ok {
+		return v.(models.Device), ok
+	}
+	return models.Device{}, false
+}
+
 var (
 	logger           log.Logger
 	server           sipserver.Server
@@ -26,10 +40,12 @@ var (
 	serverDevices    models.Device
 	addr             string
 	deviceContactMap map[string]sip.ContactUri
+	activeDevices    ActiveDevices
 )
 
 func init() {
 	deviceContactMap = make(map[string]sip.ContactUri, 0)
+	activeDevices = ActiveDevices{sync.Map{}}
 
 	logger = log.NewDefaultLogrusLogger().WithPrefix("SipServer")
 	// logger.SetLevel(log.TraceLevel)
@@ -116,7 +132,7 @@ func MESSAGE(req sip.Request, tx sip.ServerTransaction) {
 		return
 	} else {
 		// 存在的话 生成contact_uri
-		if deviceContactMap[fromDevice.DeviceId] == nil {
+		if deviceContactMap[fromDevice.DeviceId] == nil && db_device.Contact != "" {
 			uri, _ := parser.ParseSipUri(fmt.Sprintf("%s", db_device.Contact))
 			deviceContactMap[fromDevice.DeviceId] = &uri
 		}

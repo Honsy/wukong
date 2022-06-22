@@ -26,6 +26,7 @@ type Device struct {
 	Contact    string          `json:"contact"` // 设备Contact信息 全局作用域
 	ContactUri *sip.ContactUri `gorm:"-"`
 	Addr       *sip.Address    `gorm:"-"`
+	Source     string
 }
 
 // Devices 摄像头信息

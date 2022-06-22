@@ -14,7 +14,7 @@
       <el-table-column prop="modified_on"></el-table-column>
       <el-table-column label="操作" >
         <template slot-scope="scope">
-          <el-button type="text">播放</el-button>
+          <el-button type="text" @click="playVideo(scope.row)">播放</el-button>
           <el-button type="text">删除</el-button>
         </template>
       </el-table-column>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { playCameraWithDeviceId } from "@/api";
 export default {
   props: {
     tableData: {
@@ -31,6 +32,16 @@ export default {
         return [];
       },
     },
+  },
+  methods: {
+    playVideo(camera) {
+      const params = {
+        device_id: camera.device_id
+      }
+      playCameraWithDeviceId(params).then(res=>{
+        console.log(res)
+      })
+    }
   }
 }
 </script>

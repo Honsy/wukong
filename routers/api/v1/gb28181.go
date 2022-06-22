@@ -89,7 +89,7 @@ func PlayCameraWithCameraId(c *gin.Context) {
 
 	switch res.(type) {
 	case error, string:
-		appG.Response(http.StatusOK, enum.ERROR_PLAY_CAMERA, nil)
+		appG.Response(http.StatusOK, enum.ERROR_PLAY_CAMERA, res)
 		return
 	}
 

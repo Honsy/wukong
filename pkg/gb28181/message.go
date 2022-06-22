@@ -73,14 +73,25 @@ func GetCatalogXML(id string) string {
 
 // 心跳逻辑处理
 func sipMessageOnKeepAlive(u models.Device, body string) error {
+	var active = 0
 	message := &MessageNotify{}
 	if err := lib.XMLDecode([]byte(body), message); err != nil {
 		logging.Error("Message Unmarshal xml err:", err, "body:", body)
 		return err
 	}
 
-	// 更新数据库设备状态
-
+	// 更新全局变量
+	if message.Status == "OK" {
+		active = 1
+		activeDevices.Store(u.DeviceId, u)
+	} else {
+		active = 0
+		activeDevices.Delete(u.DeviceId)
+	}
+	// 更新数据库状态
+	models.UpdateDevice(u.DeviceId, map[string]interface{}{
+		"active": active,
+	})
 	return nil
 }
 
