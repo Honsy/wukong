@@ -41,6 +41,13 @@ var (
 	addr             string
 	deviceContactMap map[string]sip.ContactUri
 	activeDevices    ActiveDevices
+	statusSucc       = "0"
+	statusAuthERR    = "1000"
+	statusDBERR      = "1001"
+	statusParamsERR  = "1002"
+	statusSysERR     = "1003"
+	streamTypePull   = "pull"
+	streamTypePush   = "push"
 )
 
 func init() {

@@ -1,0 +1,24 @@
+INVITE sip:34020000001320000003@10.0.16.187:5063 SIP/2.0
+Via: SIP/2.0/UDP 10.0.16.187:5061;branch=z9hG4bK.k4WWbhN3mQrJ62h70qAwr5uWKErNp1Ut
+To: <sip:34020000001320000003@10.0.16.187:5063>
+Contact: <sip:34020000001320000003@10.0.16.187:5063;line=80d06b66787ec8b>
+From: <sip:34020000001320000003@10.0.16.187:5063;line=80d06b66787ec8b>
+Content-Type: application/sdp
+CSeq: 0 INVITE
+Allow: INVITE, ACK, CANCEL, MESSAGE, REGISTER
+User-Agent: GoSIP
+Content-Length: 240
+
+v=0
+o=37070000081318 0 0 IN IP4 10.0.16.187
+s=Play
+c=IN IP4 10.0.16.187
+t=0 0
+m=video 9000 TCP/RTP/AVP 96 98 97
+a=recvonly
+a=setup:passive
+a=connection:new
+a=rtpmap:96 PS/90000
+a=rtpmap:98 H264/90000
+a=rtpmap:97 MPEG4/90000
+y=

@@ -113,7 +113,7 @@ func (tx *clientTx) Init() error {
 		// start timer A (Timer A controls request retransmissions).
 		// Timer A - retransmission
 
-		// 此处关闭UDP传输下的消息重试机制
+		// HSY 此处关闭UDP传输下的消息重试机制
 		// tx.Log().Tracef("timer_a set to %v", Timer_A)
 
 		// tx.mu.Lock()

@@ -53,7 +53,7 @@ type Camera struct {
 	Active int64  `json:"active"`
 	URIStr string `json:"uri"`
 
-	addr *sip.Address `gorm:"-"`
+	Addr *sip.Address `gorm:"-"`
 }
 
 // 查询Device根据deviceid

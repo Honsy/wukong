@@ -276,10 +276,10 @@ func (tsl *transactionLayer) Request(req sip.Request) (sip.ClientTransaction, er
 		return nil, fmt.Errorf("transaction layer is canceled")
 	default:
 	}
-
-	if req.IsAck() {
-		return nil, fmt.Errorf("ACK request must be sent directly through transport")
-	}
+	// HSY 暂时解除Ack请求限制
+	// if req.IsAck() {
+	// 	return nil, fmt.Errorf("ACK request must be sent directly through transport")
+	// }
 
 	tx, err := NewClientTx(req, tsl.tpl, tsl.Log())
 	if err != nil {
