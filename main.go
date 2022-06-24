@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -40,17 +38,7 @@ func main() {
 
 	endPoint := fmt.Sprintf(":%d", setting.ServerSetting.HttpPort)
 
-	server := &http.Server{
-		Addr:           endPoint,
-		Handler:        routersInit,
-		ReadTimeout:    60 * time.Second,
-		WriteTimeout:   60 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-
 	logging.Warn("start http server listening %s", endPoint)
 
-	err := server.ListenAndServe()
-
-	logging.Fatal(err)
+	routersInit.Run(endPoint)
 }

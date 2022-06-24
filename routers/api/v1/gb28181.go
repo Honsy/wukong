@@ -93,5 +93,5 @@ func PlayCameraWithCameraId(c *gin.Context) {
 		return
 	}
 
-	appG.Response(http.StatusOK, enum.SUCCESS, nil)
+	appG.Response(http.StatusOK, enum.SUCCESS, res)
 }

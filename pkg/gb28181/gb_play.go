@@ -71,7 +71,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 		byteData   []byte
 	)
 	name := "Play"
-	protocal := "TCP/RTP/AVP"
+	protocal := "RTP/AVP"
 	if data.T == 1 {
 		name = "Playback"
 		protocal = "RTP/RTCP"
@@ -86,7 +86,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 		Description: sdp.MediaDescription{
 			Type:     "video",
 			Port:     gbConfig.mediaServerRtpPort,
-			Formats:  []string{"96", "98", "97"},
+			Formats:  []string{"96", "98"},
 			Protocol: protocal,
 		},
 	}
@@ -97,7 +97,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 	}
 	video.AddAttribute("rtpmap", "96", "PS/90000")
 	video.AddAttribute("rtpmap", "98", "H264/90000")
-	// video.AddAttribute("rtpmap", "97", "MPEG4/90000")
+	// video.AddAttribute("rtpmap", "98", "H264/90000")
 
 	// sdp消息体
 	sdpMessage := &sdp.Message{
@@ -117,6 +117,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 			},
 		},
 		Medias: []sdp.Media{video},
+		SSRC:   data.SSRC,
 	}
 	if data.T == 1 {
 		sdpMessage.URI = fmt.Sprintf("%s:0", data.DeviceID)

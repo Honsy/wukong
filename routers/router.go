@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"net/http"
 	"test/log"
 	"test/routers/api"
 	v1 "test/routers/api/v1"
@@ -10,10 +11,11 @@ import (
 
 func InitRouter() *gin.Engine {
 
-	r := gin.New()
+	r := gin.Default()
 	// 自定义Gin Logger
 	r.Use(log.GinLogger())
 	r.Use(gin.Recovery())
+	r.StaticFS("/more_static", http.Dir("ZLMediaKitX64/www"))
 
 	root := r.Group("/wukong")
 	root.POST("/auth", api.GetAuth)
