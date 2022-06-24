@@ -93,7 +93,7 @@ func ConfigLocalFilesystemLogger(logger logrus.Logger, logPath string, logFileNa
 	baseLogPath := path.Join(logPath, logFileName)
 	writer, err := rotatelogs.New(
 		baseLogPath+"-%Y%m%d%H%M.log",
-		//rotatelogs.WithLinkName(baseLogPath), // 生成软链，指向最新日志文件
+		// rotatelogs.WithLinkName(baseLogPath),      // 生成软链，指向最新日志文件
 		rotatelogs.WithMaxAge(maxAge),             // 文件最大保存时间
 		rotatelogs.WithRotationTime(rotationTime), // 日志切割时间间隔
 	)
@@ -107,15 +107,17 @@ func ConfigLocalFilesystemLogger(logger logrus.Logger, logPath string, logFileNa
 		logrus.ErrorLevel: writer,
 		logrus.FatalLevel: writer,
 		logrus.PanicLevel: writer,
-	}, &logrus.TextFormatter{DisableColors: true})
+	}, logger.Formatter)
 	logger.SetReportCaller(true) //将函数名和行数放在日志里面
 	logger.AddHook(lfHook)
 }
 
 func NewDefaultLogrusLogger() *LogrusLogger {
 	logger := logrus.New()
+	// 文件格式
 	logger.SetFormatter(&LogFormatter{})
-	ConfigLocalFilesystemLogger(*logger, "/tmp", "wukong", time.Hour*24*30, time.Hour*24)
+	// 日志切割
+	ConfigLocalFilesystemLogger(*logger, "./tmp", "wukong", time.Hour*24*30, time.Hour*24)
 	return NewLogrusLogger(logger, "main", nil)
 }
 
