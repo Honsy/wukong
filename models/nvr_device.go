@@ -10,7 +10,7 @@ import (
 type Device struct {
 	Model
 	Name       string          `json:"name"`
-	DeviceId   string          `json:"device_id"`
+	DeviceId   string          `json:"device_id"` // DeviceID 设备编号
 	Region     string          `json:"region"`
 	Host       string          `json:"host"`
 	Port       string          `json:"port"`

@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"test/models"
+
+	"gorm.io/gorm"
 )
 
 // DeviceStream DeviceStream
@@ -35,13 +38,16 @@ var _playList playList
 func getSSRC(t int) string {
 	r := false
 	for {
+		_playList.ssrc++
+		key := fmt.Sprintf("%d%s%04d", t, gbConfig.GB28181.Region[3:8], _playList.ssrc)
+		// 数据可查询
+		if stream, err := models.GetStreamWithSSRC(ssrc2stream(key)); err == gorm.ErrRecordNotFound || stream.SSRC == "" {
+			return key
+		}
 		if _playList.ssrc > 9000 && !r {
 			_playList.ssrc = 0
 			r = true
 		}
-		_playList.ssrc++
-		key := fmt.Sprintf("%d%s%04d", t, gbConfig.GB28181.Region[3:8], _playList.ssrc)
-		return key
 	}
 }
 

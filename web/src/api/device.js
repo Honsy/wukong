@@ -26,3 +26,13 @@ export function playCameraWithDeviceId(data) {
     data
   })
 }
+
+
+// 停止播放GB设备子设备
+export function stopPlayCameraWithDeviceId(data) {
+  return request({
+    url: '/api/v1/gb28181/stopVideo',
+    method: 'POST',
+    data
+  })
+}

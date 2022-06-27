@@ -48,6 +48,7 @@ var (
 	statusSysERR     = "1003"
 	streamTypePull   = "pull"
 	streamTypePush   = "push"
+	ssrcLock         *sync.Mutex
 )
 
 func init() {
@@ -110,7 +111,7 @@ func loadConfig() {
 			Params:      sip.NewParams(),
 		},
 	}
-
+	ssrcLock = &sync.Mutex{}
 }
 
 func INVITE(req sip.Request, tx sip.ServerTransaction) {

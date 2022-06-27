@@ -3,7 +3,6 @@ package gb28181
 import (
 	"fmt"
 	"net/http"
-	"sync"
 	"test/lib"
 	"test/models"
 	"test/pkg/logging"
@@ -62,8 +61,6 @@ func GBPlay(data PlayParams) interface{} {
 	return succ
 }
 
-var ssrcLock *sync.Mutex
-
 // 推送Media RTP Server
 func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (PlayParams, error) {
 	var (
@@ -77,9 +74,18 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 		protocal = "RTP/RTCP"
 	}
 	if data.SSRC == "" {
-		// ssrcLock.Lock()
+		ssrcLock.Lock()
 		data.SSRC = getSSRC(data.T)
-		// ssrcLock.Unlock()
+		models.InsertStream(models.Stream{
+			Type:       data.T,
+			CameraId:   camera.DeviceID,
+			DeviceId:   device.DeviceId,
+			SSRC:       ssrc2stream(data.SSRC),
+			StreamType: streamTypePush, //  pull 媒体服务器主动拉流，push 监控设备主动推流
+			Status:     -1,
+			Time:       time.Now().Format("2006-01-02 15:04:05"),
+		})
+		ssrcLock.Unlock()
 	}
 	// body体
 	video := sdp.Media{
@@ -187,7 +193,7 @@ func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (Pl
 		logging.Warn("ack request fail.id:", device.DeviceId, "err:", err)
 		return data, err
 	}
-	// data.SSRC = ssrc2stream(data.SSRC)
+	data.SSRC = ssrc2stream(data.SSRC)
 	// data.streamType = streamTypePush
 	// from, _ := response.From()
 	// to, _ := response.To()
