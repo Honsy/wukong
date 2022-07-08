@@ -42,6 +42,11 @@ func InitRouter() *gin.Engine {
 			gb28181.POST("/playVideo", v1.PlayCameraWithCameraId)
 			gb28181.POST("/stopVideo", v1.StopPlayCameraWithCameraId)
 		}
+		// rtsp
+		rtsp := apiv1.Group("/rtsp")
+		{
+			rtsp.GET("/test", v1.TestRtspUrl)
+		}
 	}
 	return r
 }

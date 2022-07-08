@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestOnvifRtsp(c *gin.Context) {
+func TestRtspUrl(c *gin.Context) {
 	appG := app.Gin{C: c}
 
 	rtspUrl := c.Query("url")
