@@ -40,6 +40,7 @@ func InitRouter() *gin.Engine {
 			gb28181.GET("/deviceList", v1.GetDeviceList)
 			gb28181.GET("/subDeviceList", v1.GetCamerasWithDeivceId)
 			gb28181.POST("/playVideo", v1.PlayCameraWithCameraId)
+			gb28181.POST("/stopVideo", v1.StopPlayCameraWithCameraId)
 		}
 	}
 	return r

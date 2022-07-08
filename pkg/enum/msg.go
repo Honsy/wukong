@@ -12,6 +12,7 @@ var MsgFlags = map[int]string{
 	ERROR_GET_DEVICE_LIST:          "获取设备列表失败",
 	ERROR_GET_CAMERAS_LIST:         "获取子设备列表失败",
 	ERROR_PLAY_CAMERA:              "播放通道失败",
+	ERROR_STREAM_NOTFOUND:          "视频流不存在或已关闭",
 }
 
 // GetMsg get error information based on Code

@@ -61,6 +61,12 @@ func GBPlay(data PlayParams) interface{} {
 	return succ
 }
 
+// GBPlay停止
+func GBStopPlay() interface{} {
+
+	return nil
+}
+
 // 推送Media RTP Server
 func gbPlayPush(data PlayParams, camera models.Camera, device models.Device) (PlayParams, error) {
 	var (

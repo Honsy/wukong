@@ -27,25 +27,27 @@ type DeviceStream struct {
 
 type playList struct {
 	// key=ssrc value=PlayParams  播放对应的PlayParams 用来发送bye获取tag，callid等数据
-	ssrcResponse *sync.Map
+	SsrcResponse *sync.Map
 	// key=deviceid value={ssrc,path}  当前设备直播信息，防止重复直播
 	devicesSucc *sync.Map
 	ssrc        int
 }
 
-var _playList playList
+var (
+	PlayList playList
+)
 
 func getSSRC(t int) string {
 	r := false
 	for {
-		_playList.ssrc++
-		key := fmt.Sprintf("%d%s%04d", t, gbConfig.GB28181.Region[3:8], _playList.ssrc)
+		PlayList.ssrc++
+		key := fmt.Sprintf("%d%s%04d", t, gbConfig.GB28181.Region[3:8], PlayList.ssrc)
 		// 数据可查询
 		if stream, err := models.GetStreamWithSSRC(ssrc2stream(key)); err == gorm.ErrRecordNotFound || stream.SSRC == "" {
 			return key
 		}
-		if _playList.ssrc > 9000 && !r {
-			_playList.ssrc = 0
+		if PlayList.ssrc > 9000 && !r {
+			PlayList.ssrc = 0
 			r = true
 		}
 	}

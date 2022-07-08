@@ -95,3 +95,27 @@ func PlayCameraWithCameraId(c *gin.Context) {
 
 	appG.Response(http.StatusOK, enum.SUCCESS, res)
 }
+
+// 停止播放子设备
+func StopPlayCameraWithCameraId(c *gin.Context) {
+	var (
+		playParams ApiPlayParams
+	)
+
+	appG := app.Gin{C: c}
+
+	httpCode, errCode := app.BindAndValid(c, &playParams)
+	if errCode != enum.SUCCESS {
+		appG.Response(httpCode, errCode, nil)
+		return
+	}
+	// d := gb28181.PlayParams{S: time.Time{}, E: time.Time{}, DeviceID: playParams.DeviceID}
+	if _, ok := gb28181.PlayList.SsrcResponse.Load(playParams.DeviceID); !ok {
+		appG.Response(http.StatusOK, enum.ERROR_STREAM_NOTFOUND, nil)
+		return
+	}
+
+	res := gb28181.GBStopPlay()
+
+	appG.Response(http.StatusOK, enum.SUCCESS, res)
+}
