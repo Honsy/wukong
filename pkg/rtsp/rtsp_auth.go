@@ -11,6 +11,7 @@ type CurrentAuthenticator interface {
 	password() string
 	nonce() string
 	computeDigestResponse(string, string) string
+	setUsernameAndPassword(string, string)
 }
 
 type currentAuthenticator struct {
@@ -33,6 +34,11 @@ func (ca currentAuthenticator) password() string {
 }
 func (ca currentAuthenticator) nonce() string {
 	return ca.fNonce
+}
+
+func (ca currentAuthenticator) setUsernameAndPassword(username string, password string) {
+	ca.fUsername = username
+	ca.fPassword = password
 }
 
 func (ca currentAuthenticator) computeDigestResponse(cmd string, url string) string {

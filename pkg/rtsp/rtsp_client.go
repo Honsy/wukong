@@ -7,23 +7,28 @@ import (
 )
 
 var (
-	fBaseURL                    string               // 根Url
-	fRtspOption                 RTSPOptions          // rtsp配置
-	fRtspClient                 RTSPClient           // rtsp对象
-	fConnection                 net.Conn             // Socket Connection
-	fRequestsAwaitingConnection []RequestRecord      // 存放等待请求的数组
-	connectionIsPending         bool                 // 请求Pending标志位
-	fInputSocketNum             int                  // 是否成功发起Socket连接 0 1 -1
-	fCurrentAuthenticator       CurrentAuthenticator // RTSP认证
-	fUserAgentHeader            string               // UA Header
+	fBaseURL                    string                                // 根Url
+	fRtspOption                 RTSPOptions                           // rtsp配置
+	fRtspClient                 RTSPClient                            // rtsp对象
+	fConnection                 net.Conn                              // Socket Connection
+	fRequestsAwaitingConnection []RequestRecord                       // 存放等待请求的数组
+	connectionIsPending         bool                                  // 请求Pending标志位
+	fInputSocketNum             int                                   // 是否成功发起Socket连接 0 1 -1
+	fCurrentAuthenticator       CurrentAuthenticator                  // RTSP认证
+	fUserAgentHeader            string                                // UA Header
+	bufferSize                  uint16               = 65535 - 20 - 8 // IPv4 max size - IPv4 Header size - UDP Header size
+	fCSeq                       int                                   // 请求序列号
 )
 
 type RTSPClient interface {
 	sendDescribeCommand()
 	ContinueAfterClientCreation1()
+	// Requests returns channel with new incoming server transactions.
+	Requests() <-chan requestRecord
 }
 
 type rtspClient struct {
+	requests chan requestRecord
 }
 
 func Setup(rtspURL string) {
@@ -32,14 +37,30 @@ func Setup(rtspURL string) {
 
 // 初始化实例
 func NewRtspClient(rtspURL string) (r RTSPClient) {
+	// 常量赋值
 	rtspClient := &rtspClient{}
 	fRtspOption = ParseRTSPUrl(rtspURL)
+	fCurrentAuthenticator = &currentAuthenticator{
+		fUsername: "",
+		fPassword: "",
+		fRealm:    "",
+		fNonce:    "",
+	}
+	fInputSocketNum = -1
+	fCSeq = 0
+
+	// 设置UA
+	setBaseUrl(rtspURL)
 	setUserAgentString("GO RTSP")
 	return rtspClient
 }
 
 func (rc rtspClient) ContinueAfterClientCreation1() {
 	rc.sendOptionsCommand()
+}
+
+func (rc rtspClient) Requests() <-chan requestRecord {
+	return rc.requests
 }
 
 // 设置根Url
@@ -50,63 +71,105 @@ func setBaseUrl(rtspURL string) {
 // 打开Socket
 func openConnection() error {
 	var err error
+
+	if fRtspOption.username != "" || fRtspOption.password != "" {
+		fCurrentAuthenticator.setUsernameAndPassword(fRtspOption.username, fRtspOption.password)
+	}
+
 	fConnection, err = net.Dial("tcp", fRtspOption.address)
 	if err != nil {
 		logging.Error("RTSP连接失败！", fBaseURL)
+		fInputSocketNum = -1
 		return err
 	}
+	logging.Debug("TCP连接成功！正在监听消息...")
+
+	listenMessages()
+	fInputSocketNum = 1
 
 	return nil
 }
 
+// 读取socket信息
+func listenMessages() {
+	// 循环读取通道内部消息
+	buf := make([]byte, bufferSize)
+	go func() {
+		for {
+			logging.Debug("dddd", fConnection)
+			if fConnection != nil {
+				num, err := fConnection.Read(buf)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
+
+				data := buf[:num]
+
+				logging.Debug(string(data))
+			}
+		}
+	}()
+}
+
 // 发送Describe命令
 func (r rtspClient) sendDescribeCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "Describe", ""))
 }
 
 // 发送Options命令
 func (r rtspClient) sendOptionsCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "OPTIONS", ""))
 }
 
 // 发送Announce命令
 func (r rtspClient) sendAnnounceCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "ANNOUNCE", ""))
 }
 
 // 发送Setup命令
 func (r rtspClient) sendSetupCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "SETUP", ""))
 }
 
 // 发送Play命令
 func (r rtspClient) sendPlayCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "PLAY", ""))
 }
 
 // 发送Pause命令
 func (r rtspClient) sendPauseCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "PAUSE", ""))
 }
 
 // 发送Record命令
 func (r rtspClient) sendRecordCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "RECORD", ""))
 }
 
 // 发送Teardown命令
 func (r rtspClient) sendTeardownCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "TEARDOWN", ""))
 }
 
 // 发送SetParameter命令
 func (r rtspClient) sendSetParameterCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "SETPARAMETER", ""))
 }
 
 // 发送GetParameter命令
 func (r rtspClient) sendGetParameterCommand() {
-	r.sendRequest(NewRequestRecord())
+	fCSeq += 1
+	r.sendRequest(NewRequestRecord(fCSeq, "GETPARAMETER", ""))
 }
 
 func (r rtspClient) sendRequest(request RequestRecord) string {
@@ -135,7 +198,7 @@ func (r rtspClient) sendRequest(request RequestRecord) string {
 	var authenticatorStr = createAuthenticatorString(request.commandName(), fBaseURL)
 
 	var cmdFmt = fmt.Sprintf("%s %s %s\r\n", request.commandName(), fBaseURL, protocolStr) +
-		fmt.Sprintf("CSeq: %d\r\n", request.cseq()) +
+		fmt.Sprintf("CSeq: %s\r\n", request.cseq()) +
 		authenticatorStr +
 		fUserAgentHeader +
 		extraHeaders +
@@ -145,6 +208,7 @@ func (r rtspClient) sendRequest(request RequestRecord) string {
 
 	_, err := fConnection.Write([]byte(cmdFmt))
 
+	logging.Debug("发送请求：", cmdFmt)
 	if err != nil {
 		return err.Error()
 	}

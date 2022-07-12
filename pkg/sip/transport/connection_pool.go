@@ -592,6 +592,7 @@ func (handler *connectionHandler) readConnection() (<-chan sip.Message, <-chan e
 
 			if err != nil {
 				//// if we get timeout error just go further and try read on the next iteration
+				// HSY 去除
 				//var netErr net.Error
 				//if errors.As(err, &netErr) {
 				//	if netErr.Timeout() || netErr.Temporary() {

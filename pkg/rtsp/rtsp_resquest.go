@@ -18,8 +18,12 @@ type requestRecord struct {
 	fContentStr  string
 }
 
-func NewRequestRecord() (r RequestRecord) {
-	rr := &requestRecord{}
+func NewRequestRecord(cseq int, commandName string, contentStr string) (r RequestRecord) {
+	rr := &requestRecord{
+		fCSeq:        fmt.Sprint(cseq),
+		fCommandName: commandName,
+		fContentStr:  contentStr,
+	}
 	return rr
 }
 
@@ -28,7 +32,7 @@ func SetRequsetFields(r RequestRecord, cmdUrl string, protocolStr string, extraH
 	if strings.ToUpper(r.commandName()) == "DESCRIBE" {
 		extraHeaders = "Accept: application/sdp\r\n"
 	} else if strings.ToUpper(r.commandName()) == "OPTIONS" {
-		extraHeaders = createSessionString("ddd")
+		extraHeaders = ""
 	} else if strings.ToUpper(r.commandName()) == "ANNOUNCE" {
 		extraHeaders = "Content-Type: application/sdp\r\n"
 	} else if strings.ToUpper(r.commandName()) == "SETUP" {
