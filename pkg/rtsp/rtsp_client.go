@@ -1,6 +1,7 @@
 package rtsp
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"test/pkg/logging"
@@ -9,7 +10,8 @@ import (
 var (
 	fBaseURL                    string                                // 根Url
 	fRtspOption                 RTSPOptions                           // rtsp配置
-	fRtspClient                 RTSPClient                            // rtsp对象
+	fRtspClient                 RTSPClient                            // rtsp 接口抽象对象
+	fRtsp                       rtspClient                            // rtsp 结构体对象
 	fConnection                 net.Conn                              // Socket Connection
 	fRequestsAwaitingConnection []RequestRecord                       // 存放等待请求的数组
 	connectionIsPending         bool                                  // 请求Pending标志位
@@ -29,6 +31,7 @@ type RTSPClient interface {
 
 type rtspClient struct {
 	requests chan requestRecord
+	br       *bufio.Reader
 }
 
 func Setup(rtspURL string) {
@@ -38,7 +41,7 @@ func Setup(rtspURL string) {
 // 初始化实例
 func NewRtspClient(rtspURL string) (r RTSPClient) {
 	// 常量赋值
-	rtspClient := &rtspClient{}
+	fRtsp := &rtspClient{}
 	fRtspOption = ParseRTSPUrl(rtspURL)
 	fCurrentAuthenticator = &currentAuthenticator{
 		fUsername: "",
@@ -52,7 +55,7 @@ func NewRtspClient(rtspURL string) (r RTSPClient) {
 	// 设置UA
 	setBaseUrl(rtspURL)
 	setUserAgentString("GO RTSP")
-	return rtspClient
+	return fRtsp
 }
 
 func (rc rtspClient) ContinueAfterClientCreation1() {
@@ -82,6 +85,7 @@ func openConnection() error {
 		fInputSocketNum = -1
 		return err
 	}
+	fRtsp.br = bufio.NewReaderSize(fConnection, int(bufferSize))
 	logging.Debug("TCP连接成功！正在监听消息...")
 
 	listenMessages()
@@ -94,19 +98,29 @@ func openConnection() error {
 func listenMessages() {
 	// 循环读取通道内部消息
 	buf := make([]byte, bufferSize)
+
 	go func() {
 		for {
-			logging.Debug("dddd", fConnection)
 			if fConnection != nil {
 				num, err := fConnection.Read(buf)
 				if err != nil {
 					logging.Error(err)
 					return
 				}
+				logging.Debug("dddd", fConnection)
+				_, err = fRtsp.br.Read(buf[:num])
+				logging.Debug("dddd1", fConnection)
+				if err != nil {
+					logging.Error(err)
+					return
+				}
+				var res Response
+				logging.Debug("dddd1", fConnection)
+				res.Read(fRtsp.br)
 
-				data := buf[:num]
+				// data := buf[:num]
 
-				logging.Debug(string(data))
+				// logging.Debug(string(data))
 			}
 		}
 	}()
@@ -115,7 +129,7 @@ func listenMessages() {
 // 发送Describe命令
 func (r rtspClient) sendDescribeCommand() {
 	fCSeq += 1
-	r.sendRequest(NewRequestRecord(fCSeq, "Describe", ""))
+	r.sendRequest(NewRequestRecord(fCSeq, "DESCRIBE", ""))
 }
 
 // 发送Options命令
@@ -212,5 +226,9 @@ func (r rtspClient) sendRequest(request RequestRecord) string {
 	if err != nil {
 		return err.Error()
 	}
+
+	// 开始读取请求响应
+	// fConnection.Read()
+
 	return ""
 }

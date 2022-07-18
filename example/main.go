@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"test/pkg/rtsp"
@@ -16,10 +15,7 @@ func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c)
 	go func() {
-		fmt.Println("Go routine running")
 		time.Sleep(3 * time.Second)
-		fmt.Println("Go routine done")
 	}()
 	<-c
-	fmt.Println("bye")
 }

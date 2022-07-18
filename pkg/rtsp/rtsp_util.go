@@ -1,6 +1,8 @@
 package rtsp
 
 import (
+	"bufio"
+	"fmt"
 	"strings"
 )
 
@@ -52,4 +54,19 @@ func ParseRTSPUrl(url string) (rOptions RTSPOptions) {
 	}
 
 	return *rtspOptions
+}
+
+func readBytesLimited(rb *bufio.Reader, delim byte, n int) ([]byte, error) {
+	for i := 1; i <= n; i++ {
+		byts, err := rb.Peek(i)
+		if err != nil {
+			return nil, err
+		}
+
+		if byts[len(byts)-1] == delim {
+			rb.Discard(len(byts))
+			return byts, nil
+		}
+	}
+	return nil, fmt.Errorf("buffer length exceeds %d", n)
 }
