@@ -104,6 +104,7 @@ func getProfiles() (string, error) {
 		if err != nil {
 			return "", err
 		}
+		logging.Debug("media2Support", string(data))
 
 		profileEnvelope := new(types.GetProfilesEnvelope)
 		err = xml.Unmarshal(data, profileEnvelope)
@@ -128,13 +129,13 @@ func getProfiles() (string, error) {
 			return "", nil
 		}
 
-		_, err = ioutil.ReadAll(res.Body)
+		data, err := ioutil.ReadAll(res.Body)
 
 		if err != nil {
 			return "", err
 		}
 
-		// log.Printf("getProfiles %s", string(data))
+		logging.Printf("getProfiles %s", string(data))
 		return "", nil
 	}
 

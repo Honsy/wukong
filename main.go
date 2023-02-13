@@ -5,8 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"test/models"
-	"test/pkg/gb28181"
 	"test/pkg/logging"
 	"test/pkg/onvif"
 	"test/pkg/setting"
@@ -20,18 +18,18 @@ var (
 
 func init() {
 	setting.Setup()
-	models.Setup()
+	// models.Setup()
 }
 
 func main() {
 	gin.SetMode(setting.ServerSetting.RunMode)
-	gb28181.Setup()
+	// gb28181.Setup()
 	// onvif
 	onvif.Setup(onvif.CameraOption{
-		Hostname: "10.0.30.33",
+		Hostname: "10.0.16.111",
 		Port:     80,
 		Username: "admin",
-		Passowrd: "admin1234",
+		Passowrd: "l1234567",
 	})
 
 	routersInit := routers.InitRouter()

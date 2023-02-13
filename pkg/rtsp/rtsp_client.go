@@ -31,7 +31,7 @@ type RTSPClient interface {
 
 type rtspClient struct {
 	requests chan requestRecord
-	br       *bufio.Reader
+	connRW   *bufio.Reader
 }
 
 func Setup(rtspURL string) {
@@ -41,21 +41,32 @@ func Setup(rtspURL string) {
 // 初始化实例
 func NewRtspClient(rtspURL string) (r RTSPClient) {
 	// 常量赋值
-	fRtsp := &rtspClient{}
-	fRtspOption = ParseRTSPUrl(rtspURL)
-	fCurrentAuthenticator = &currentAuthenticator{
-		fUsername: "",
-		fPassword: "",
-		fRealm:    "",
-		fNonce:    "",
-	}
-	fInputSocketNum = -1
-	fCSeq = 0
+	// fRtsp := &rtspClient{}
+	// fRtspOption = ParseRTSPUrl(rtspURL)
+	// fCurrentAuthenticator = &currentAuthenticator{
+	// 	fUsername: "",
+	// 	fPassword: "",
+	// 	fRealm:    "",
+	// 	fNonce:    "",
+	// }
+	// fInputSocketNum = -1
+	// fCSeq = 0
 
-	// 设置UA
-	setBaseUrl(rtspURL)
-	setUserAgentString("GO RTSP")
-	return fRtsp
+	// // 开始建立连接
+	// fConnection, _ := net.Dial("tcp", fRtspOption.address)
+
+	// timeoutConn := RichConn{
+	// 	conn,
+	// 	timeout,
+	// }
+
+	// bufio.NewReaderSize(fConnection, int(bufferSize))
+
+	// // 设置UA
+	// setBaseUrl(rtspURL)
+	// setUserAgentString("GO RTSP")
+	// return fRtsp
+	return nil
 }
 
 func (rc rtspClient) ContinueAfterClientCreation1() {
@@ -80,16 +91,24 @@ func openConnection() error {
 	}
 
 	fConnection, err = net.Dial("tcp", fRtspOption.address)
+
 	if err != nil {
 		logging.Error("RTSP连接失败！", fBaseURL)
 		fInputSocketNum = -1
 		return err
 	}
-	fRtsp.br = bufio.NewReaderSize(fConnection, int(bufferSize))
-	logging.Debug("TCP连接成功！正在监听消息...")
 
-	listenMessages()
-	fInputSocketNum = 1
+	// timeoutConn := RichConn{
+	// 	fConnection,
+	// 	time.Second * 6000,
+	// }
+
+	// fRtsp.connRW = bufio.NewReadWriter(bufio.NewReaderSize(&timeoutConn, int(bufferSize)), bufio.NewWriterSize(&timeoutConn, int(bufferSize)))
+
+	// logging.Debug("TCP连接成功！正在监听消息...")
+
+	// listenMessages()
+	// fInputSocketNum = 1
 
 	return nil
 }
@@ -97,26 +116,26 @@ func openConnection() error {
 // 读取socket信息
 func listenMessages() {
 	// 循环读取通道内部消息
-	buf := make([]byte, bufferSize)
+	// buf := make([]byte, bufferSize)
 
 	go func() {
 		for {
 			if fConnection != nil {
-				num, err := fConnection.Read(buf)
-				if err != nil {
-					logging.Error(err)
-					return
-				}
-				logging.Debug("dddd", fConnection)
-				_, err = fRtsp.br.Read(buf[:num])
-				logging.Debug("dddd1", fConnection)
-				if err != nil {
-					logging.Error(err)
-					return
-				}
-				var res Response
-				logging.Debug("dddd1", fConnection)
-				res.Read(fRtsp.br)
+				// num, err := fConnection.Read(buf)
+				// if err != nil {
+				// 	logging.Error(err)
+				// 	return
+				// }
+				// logging.Debug("dddd", fConnection)
+				// _, err = fRtsp.br.Read(buf[:num])
+				// logging.Debug("dddd1", fConnection)
+				// if err != nil {
+				// 	logging.Error(err)
+				// 	return
+				// }
+				// var res Response
+				// logging.Debug("dddd1", fConnection)
+				// res.Read(fRtsp.br)
 
 				// data := buf[:num]
 
