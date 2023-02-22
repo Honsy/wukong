@@ -15,6 +15,7 @@ type UserJSON struct {
 	Passowrd string `json:"password" valid:"Required;MaxSize(255)"`
 }
 
+// 登录
 func Login(c *gin.Context) {
 	var (
 		appG = app.Gin{C: c}
@@ -23,7 +24,7 @@ func Login(c *gin.Context) {
 
 	httpCode, errCode := app.BindAndValid(c, &user)
 	if errCode != enum.SUCCESS {
-		appG.Response(httpCode, errCode, nil)
+		appG.Response(httpCode, errCode, "参数错误！")
 		return
 	}
 
@@ -51,7 +52,37 @@ func Login(c *gin.Context) {
 	})
 }
 
+// 注册
 func Register(c *gin.Context) {
-	// appG := app.Gin{C: c}
+	var (
+		appG = app.Gin{C: c}
+		user UserJSON
+	)
 
+	httpCode, errCode := app.BindAndValid(c, &user)
+	if errCode != enum.SUCCESS {
+		appG.Response(httpCode, errCode, "参数错误！")
+		return
+	}
+
+	mUser := &userservice.User{
+		Username: user.Username,
+		Password: user.Passowrd,
+	}
+	// 查询数据库是否存在该数据
+	userData, _ := mUser.GetUserByUsername()
+
+	if userData.Username != "" {
+		appG.Response(enum.SUCCESS, enum.REGISTER_FAIL, "用户名已存在！")
+		return
+	}
+
+	err := mUser.InsertUser()
+
+	if err != nil {
+		appG.Response(enum.SUCCESS, enum.REGISTER_FAIL, err)
+		return
+	}
+
+	appG.Response(enum.SUCCESS, enum.SUCCESS, nil)
 }

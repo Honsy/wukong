@@ -42,6 +42,22 @@ func InitRouter() *gin.Engine {
 			gb28181.POST("/playVideo", v1.PlayCameraWithCameraId)
 			gb28181.POST("/stopVideo", v1.StopPlayCameraWithCameraId)
 		}
+		// 插件
+		plugin := apiv1.Group("/plugin")
+		{
+			plugin.POST("/add", v1.AddPlugin)
+			plugin.POST("/delete", v1.DeletePlugin)
+			plugin.GET("", v1.GetPlugin)
+			plugin.POST("/update", v1.UpdatePlugin)
+		}
+		// 通道
+		channel := apiv1.Group("/channel")
+		{
+			channel.POST("/add", v1.AddChannel)
+			channel.POST("/delete", v1.DeleteChannel)
+			channel.GET("", v1.GetChannel)
+			channel.POST("/update", v1.UpdateChannel)
+		}
 		// rtsp
 		rtsp := apiv1.Group("/rtsp")
 		{

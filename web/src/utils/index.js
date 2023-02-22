@@ -1,6 +1,7 @@
 /**
  * Created by PanJiaChen on 16/11/18.
  */
+export * from './message';
 
 /**
  * Parse the time to string

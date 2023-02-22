@@ -41,7 +41,16 @@ export const constantRoutes = [
       meta: { title: '设备列表', icon: 'dashboard' }
     }]
   },
-
+  {
+    path: '/channel',
+    component: Layout,
+    children: [{
+      path: 'list',
+      name: '通道列表',
+      component: () => import('@/views/channel/index'),
+      meta: { title: '通道列表', icon: 'dashboard' }
+    }]
+  },
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

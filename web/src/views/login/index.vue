@@ -42,6 +42,7 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">Register</el-button>
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -54,6 +55,8 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { registerApi } from '@/api'
+import { openMessage, WKMessage } from '@/utils'
 
 export default {
   name: 'Login',
@@ -118,6 +121,15 @@ export default {
         } else {
           console.log('error submit!!')
           return false
+        }
+      })
+    },
+    handleRegister() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          registerApi(this.loginForm).then(res=>{
+            WKMessage.success('注册成功')
+          })
         }
       })
     }

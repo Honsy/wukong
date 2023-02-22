@@ -16,3 +16,15 @@ func GetUserByUsername(username string) (User, error) {
 
 	return user, err
 }
+
+// 插入用户表
+func InsertUser(username string, password string) error {
+	user := &User{
+		Username: username,
+		Password: password,
+	}
+	if err := db.Create(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
