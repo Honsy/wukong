@@ -19,13 +19,19 @@
 					<el-input class="wk-input" size="small" v-model="form.url"></el-input>
 				</el-form-item>
         <el-form-item label="通道来源：" prop="source">
-					<el-input class="wk-input" size="small" v-model="form.source"></el-input>
+					<el-select v-model="form.source" placeholder="请选择">
+						<el-option v-for="item in Object.keys(CHANNEL_TYPE)" :key="item" :label="CHANNEL_TYPE[item].label" :value="CHANNEL_TYPE[item].value"></el-option>
+					</el-select>
+					<!-- <el-input class="wk-input" size="small" v-model="form.source"></el-input> -->
 				</el-form-item>
         <el-form-item label="通道编码：" prop="code">
 					<el-input class="wk-input" size="small" v-model="form.code"></el-input>
 				</el-form-item>
         <el-form-item label="是否转封装：" prop="repackage">
-					<el-input class="wk-input" size="small" v-model="form.repackage"></el-input>
+					<el-select v-model="form.repackage" placeholder="请选择">
+						<el-option v-for="item in Object.keys(REPACKAGE_TYPE)" :key="item" :label="REPACKAGE_TYPE[item].label" :value="REPACKAGE_TYPE[item].value"></el-option>
+					</el-select>
+					<!-- <el-input class="wk-input" size="small" v-model="form.repackage"></el-input> -->
 				</el-form-item>
         <el-form-item label="封装协议：" prop="repackageFormat">
 					<el-input class="wk-input" size="small" v-model="form.repackageFormat"></el-input>
@@ -40,28 +46,14 @@
 </template>
 <script>
 import { cloneDeep } from 'lodash';
+import { CHANNEL_TYPE, REPACKAGE_TYPE } from "./../config";
 
 export default {
-	props: {
-		dialogVisible: {
-			type: Boolean,
-			default: false,
-		},
-		handleClose: {
-			type: Function,
-			default() {
-				return null;
-			},
-		},
-		dataSource: {
-			type: [Object, String],
-			default() {
-				return null;
-			},
-		},
-	},
+	props: ['dialogVisible', 'handleClose', 'dataSource'],
 	data() {
 		return {
+			CHANNEL_TYPE,
+			REPACKAGE_TYPE,
 			form: {
 				name: '',
 				url: '',
